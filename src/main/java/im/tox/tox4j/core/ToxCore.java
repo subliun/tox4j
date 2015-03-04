@@ -7,6 +7,7 @@ import im.tox.tox4j.core.enums.ToxFileControl;
 import im.tox.tox4j.core.enums.ToxFileKind;
 import im.tox.tox4j.core.enums.ToxStatus;
 import im.tox.tox4j.core.exceptions.*;
+import im.tox.tox4j.core.proto.Core;
 
 import java.io.Closeable;
 
@@ -344,6 +345,54 @@ public interface ToxCore extends Closeable {
 
     void callbackFileReceiveChunk(@Nullable FileReceiveChunkCallback callback);
 
+    /** Joins a groupchat using the supplied group key.
+     *
+     * @return groupNumber
+     */
+    int joinGroup(byte[] inviteKey);
+
+    /**
+     * Deletes groupNumber's group chat and sends an optional parting message to group peers
+     * The maximum parting message length is TOX_MAX_GROUP_PART_LENGTH.
+     */
+    void deleteGroup(int groupNumber, @NotNull byte[] partMessage);
+
+    /** Sends a groupchat message to group groupnumber. Messages should be split at TOX_MAX_MESSAGE_LENGTH bytes.
+     */
+    void sendGroupMessage(int groupNumber, @NotNull byte[] message);
+
+    /** Sends a private message to peernumber in group groupnumber. Messages should be split at TOX_MAX_MESSAGE_LENGTH bytes.
+     */
+    void sendGroupPrivateMessage(int groupNumber, int peerNumber, @NotNull byte[] message);
+
+    /** Sends a groupchat action message to groupnumber. Messages should be split at TOX_MAX_MESSAGE_LENGTH bytes.
+     */
+    void sendGroupAction(int groupNumber, @NotNull byte[] message);
+
+    void callbackGroupInvite(@Nullable GroupInviteCallback callback);
+
+    void callbackGroupMessage(@Nullable GroupMessageCallback callback);
+
+    void callbackGroupPrivateMessage(@Nullable GroupPrivateMessageCallback callback);
+
+    void callbackGroupAction(@Nullable GroupActionCallback callback);
+
+    void callbackGroupNickChange(@Nullable GroupNickChangeCallback callback);
+
+    void callbackGroupTopicChange(@Nullable GroupTopicChangeCallback callback);
+
+    void callbackPeerJoin(@Nullable GroupPeerJoinCallback callback);
+
+    void callbackPeerExit(@Nullable GroupPeerExitCallback callback);
+
+    void callbackGroupSelfJoin(@Nullable GroupSelfJoinCallback callback);
+
+    void callbackGroupPeerlistUpdate(@Nullable GroupPeerlistUpdateCallback callback);
+
+    void callbackGroupSelfTimeout(@Nullable GroupSelfTimeoutCallback callback);
+
+    void callbackGroupInviteRejected(@Nullable GroupInviteRejectedCallback callback);
+
     void sendLossyPacket(int friendNumber, @NotNull byte[] data) throws ToxSendCustomPacketException;
 
     void callbackFriendLossyPacket(@Nullable FriendLossyPacketCallback callback);
@@ -351,6 +400,7 @@ public interface ToxCore extends Closeable {
     void sendLosslessPacket(int friendNumber, @NotNull byte[] data) throws ToxSendCustomPacketException;
 
     void callbackFriendLosslessPacket(@Nullable FriendLosslessPacketCallback callback);
+
 
     /**
      * Convenience method to set all event handlers at once.

@@ -7,10 +7,7 @@ import im.tox.tox4j.core.AbstractToxCore;
 import im.tox.tox4j.core.ToxConstants;
 import im.tox.tox4j.core.ToxOptions;
 import im.tox.tox4j.core.callbacks.*;
-import im.tox.tox4j.core.enums.ToxConnection;
-import im.tox.tox4j.core.enums.ToxFileControl;
-import im.tox.tox4j.core.enums.ToxFileKind;
-import im.tox.tox4j.core.enums.ToxStatus;
+import im.tox.tox4j.core.enums.*;
 import im.tox.tox4j.core.exceptions.*;
 import im.tox.tox4j.core.proto.Core;
 
@@ -52,6 +49,18 @@ public final class ToxCoreImpl extends AbstractToxCore {
     private FileRequestChunkCallback fileRequestChunkCallback;
     private FileReceiveCallback fileReceiveCallback;
     private FileReceiveChunkCallback fileReceiveChunkCallback;
+    private GroupInviteCallback groupInviteCallback;
+    private GroupMessageCallback groupMessageCallback;
+    private GroupPrivateMessageCallback groupPrivateMessageCallback;
+    private GroupActionCallback groupActionCallback;
+    private GroupNickChangeCallback groupNickChangeCallback;
+    private GroupTopicChangeCallback groupTopicChangeCallback;
+    private GroupPeerJoinCallback groupPeerJoinCallback;
+    private GroupPeerExitCallback groupPeerExitCallback;
+    private GroupSelfJoinCallback groupSelfJoinCallback;
+    private GroupPeerlistUpdateCallback groupPeerlistUpdateCallback;
+    private GroupSelfTimeoutCallback groupSelfTimeoutCallback;
+    private GroupInviteRejectedCallback groupInviteRejectedCallback;
     private FriendLossyPacketCallback friendLossyPacketCallback;
     private FriendLosslessPacketCallback friendLosslessPacketCallback;
 
@@ -239,6 +248,17 @@ public final class ToxCoreImpl extends AbstractToxCore {
         throw new IllegalStateException("Bad enumerator: " + kind);
     }
 
+    private static @NotNull ToxGroupJoinRejected convert(@NotNull Core.GroupRejected.Kind kind) {
+        switch (kind) {
+            case NICK_TAKEN: return ToxGroupJoinRejected.NICK_TAKEN;
+            case GROUP_FULL: return ToxGroupJoinRejected.GROUP_FULL;
+            case INVITES_DISABLED: return ToxGroupJoinRejected.INVITES_DISABLED;
+            case INVITE_FAILED: return ToxGroupJoinRejected.INVITE_FAILED;
+
+        }
+        throw new IllegalStateException("Bad enumerator: " + kind);
+    }
+
     private static native @NotNull byte[] toxIteration(int instanceNumber);
 
     @Override
@@ -322,6 +342,66 @@ public final class ToxCoreImpl extends AbstractToxCore {
 				fileReceiveChunkCallback.fileReceiveChunk(fileReceiveChunk.getFriendNumber(), fileReceiveChunk.getFileNumber(), fileReceiveChunk.getPosition(), fileReceiveChunk.getData().toByteArray());
 			}
 		}
+        if (groupInviteCallback != null) {
+            for (Core.GroupInvite groupInvite : toxEvents.getGroupInviteList()) {
+                groupInviteCallback.groupInvite(groupInvite.getFriendNumber(), groupInvite.getInviteData().toByteArray());
+            }
+        }
+        if (groupMessageCallback != null) {
+            for (Core.GroupMessage groupMessage : toxEvents.getGroupMessageList()) {
+                groupMessageCallback.groupMessage(groupMessage.getGroupNumber(), groupMessage.getPeerNumber(), groupMessage.getTimeDelta(), groupMessage.getMessage().toByteArray());
+            }
+        }
+        if (groupPrivateMessageCallback != null) {
+            for (Core.GroupPrivateMessage groupPrivateMessage : toxEvents.getGroupPrivateMessageList()) {
+                groupPrivateMessageCallback.groupPrivateMessage(groupPrivateMessage.getGroupNumber(), groupPrivateMessage.getPeerNumber(), groupPrivateMessage.getTimeDelta(), groupPrivateMessage.getMessage().toByteArray());
+            }
+        }
+        if (groupActionCallback != null) {
+            for (Core.GroupAction groupAction : toxEvents.getGroupActionList()) {
+                groupActionCallback.groupAction(groupAction.getGroupNumber(), groupAction.getPeerNumber(), groupAction.getTimeDelta(), groupAction.getMessage().toByteArray());
+            }
+        }
+        if (groupNickChangeCallback != null) {
+            for (Core.GroupNickChange groupNickChange : toxEvents.getGroupNickChangeList()) {
+                groupNickChangeCallback.groupNickChange(groupNickChange.getGroupNumber(), groupNickChange.getPeerNumber(), groupNickChange.getNewNick().toByteArray());
+            }
+        }
+        if (groupTopicChangeCallback != null) {
+            for (Core.GroupTopicChange groupTopicChange : toxEvents.getGroupTopicChangeList()) {
+                groupTopicChangeCallback.groupTopicChange(groupTopicChange.getGroupNumber(), groupTopicChange.getPeerNumber(), groupTopicChange.getTopic().toByteArray());
+            }
+        }
+        if (groupPeerJoinCallback != null) {
+            for (Core.GroupPeerJoin groupPeerJoin : toxEvents.getGroupPeerJoinList()) {
+                groupPeerJoinCallback.groupPeerJoin(groupPeerJoin.getGroupNumber(), groupPeerJoin.getPeerNumber());
+            }
+        }
+        if (groupPeerExitCallback != null) {
+            for (Core.GroupPeerExit groupPeerExit : toxEvents.getGroupPeerExitList()) {
+                groupPeerExitCallback.groupPeerExit(groupPeerExit.getGroupNumber(), groupPeerExit.getPeerNumber(), groupPeerExit.getPartMessage().toByteArray());
+            }
+        }
+        if (groupSelfJoinCallback != null) {
+            for (Core.GroupSelfJoin groupSelfJoin : toxEvents.getGroupSelfJoinList()) {
+                groupSelfJoinCallback.groupSelfJoin(groupSelfJoin.getGroupNumber());
+            }
+        }
+        if (groupPeerlistUpdateCallback != null) {
+            for (Core.GroupPeerlistUpdate groupPeerlistUpdate : toxEvents.getGroupPeerlistUpdateList()) {
+                groupPeerlistUpdateCallback.groupPeerlistUpdate(groupPeerlistUpdate.getGroupNumber());
+            }
+        }
+        if (groupSelfTimeoutCallback != null) {
+            for (Core.GroupSelfTimeout groupSelfTimeout : toxEvents.getGroupSelfTimeoutList()) {
+                groupSelfTimeoutCallback.groupSelfTimeout(groupSelfTimeout.getGroupNumber());
+            }
+        }
+        if (groupInviteRejectedCallback != null) {
+            for (Core.GroupRejected groupRejected : toxEvents.getGroupRejectedList()) {
+                groupInviteRejectedCallback.groupInviteRejected(groupRejected.getGroupNumber(), convert(groupRejected.getType()));
+            }
+        }
         if (friendLossyPacketCallback != null) {
 			for (Core.FriendLossyPacket friendLossyPacket : toxEvents.getFriendLossyPacketList()) {
 				friendLossyPacketCallback.friendLossyPacket(friendLossyPacket.getFriendNumber(), friendLossyPacket.getData().toByteArray());
@@ -615,6 +695,71 @@ public final class ToxCoreImpl extends AbstractToxCore {
         this.fileReceiveChunkCallback = callback;
     }
 
+    private static native int toxGroupNewJoin(int instanceNumber, @NotNull byte[] inviteKey);
+
+    @Override
+    public int joinGroup(byte[] inviteKey) {
+        return toxGroupNewJoin(instanceNumber, inviteKey);
+    }
+
+    private static native void toxGroupDelete(int instanceNumber, int groupNumber, @NotNull byte[] partMessage);
+
+    @Override
+    public void deleteGroup(int groupNumber, @NotNull byte[] partMessage) { toxGroupDelete(instanceNumber, groupNumber, partMessage); }
+
+    private static native void toxGroupMessageSend(int instanceNumber, int groupNumber, @NotNull byte[] message);
+
+    @Override
+    public void sendGroupMessage(int groupNumber, @NotNull byte[] message) { toxGroupMessageSend(instanceNumber, groupNumber, message); }
+
+    private static native void toxGroupPrivateMessageSend(int instanceNumber, int groupNumber, int peerNumber, @NotNull byte[] message);
+
+    @Override
+    public void sendGroupPrivateMessage(int groupNumber, int peerNumber, @NotNull byte[] message) { toxGroupPrivateMessageSend(instanceNumber, groupNumber, peerNumber, message); }
+
+    private static native void toxGroupActionSend(int instanceNumber, int groupNumber, @NotNull byte[] message);
+
+    @Override
+    public void sendGroupAction(int groupNumber, @NotNull byte[] message) { toxGroupActionSend(instanceNumber, groupNumber, message); }
+
+
+    @Override
+    public void callbackGroupInvite(@Nullable GroupInviteCallback callback) { this.groupInviteCallback = callback; }
+
+    @Override
+    public void callbackGroupMessage(GroupMessageCallback callback) {
+        this.groupMessageCallback = callback;
+    }
+
+    @Override
+    public void callbackGroupPrivateMessage(@Nullable GroupPrivateMessageCallback callback) { this.groupPrivateMessageCallback = callback; }
+
+    @Override
+    public void callbackGroupAction(@Nullable GroupActionCallback callback) { this.groupActionCallback = callback; }
+
+    @Override
+    public void callbackGroupNickChange(@Nullable GroupNickChangeCallback callback) { this.groupNickChangeCallback = callback; }
+
+    @Override
+    public void callbackGroupTopicChange(@Nullable GroupTopicChangeCallback callback) { this.groupTopicChangeCallback = callback; }
+
+    @Override
+    public void callbackPeerJoin(@Nullable GroupPeerJoinCallback callback) { this.groupPeerJoinCallback = callback; }
+
+    @Override
+    public void callbackPeerExit(@Nullable GroupPeerExitCallback callback) { this.groupPeerExitCallback = callback; }
+
+    @Override
+    public void callbackGroupSelfJoin(@Nullable GroupSelfJoinCallback callback) { this.groupSelfJoinCallback = callback; }
+
+    @Override
+    public void callbackGroupPeerlistUpdate(@Nullable GroupPeerlistUpdateCallback callback) { this.groupPeerlistUpdateCallback = callback; }
+
+    @Override
+    public void callbackGroupSelfTimeout(@Nullable GroupSelfTimeoutCallback callback) { this.groupSelfTimeoutCallback = callback; }
+
+    @Override
+    public void callbackGroupInviteRejected(@Nullable GroupInviteRejectedCallback callback) { this.groupInviteRejectedCallback = callback; }
 
     private static native void toxSendLossyPacket(int instanceNumber, int friendNumber, @NotNull byte[] data) throws ToxSendCustomPacketException;
 

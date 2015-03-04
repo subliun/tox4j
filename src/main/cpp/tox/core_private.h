@@ -143,6 +143,18 @@ struct new_Tox
     callback<tox_file_request_chunk_cb> file_request_chunk;
     callback<tox_file_receive_cb> file_receive;
     callback<tox_file_receive_chunk_cb> file_receive_chunk;
+    callback<tox_group_invite_cb> group_invite;
+    callback<tox_group_message_cb> group_message;
+    callback<tox_group_private_message_cb> group_private_message;
+    callback<tox_group_action_cb> group_action;
+    callback<tox_group_nick_change_cb> group_nick_change;
+    callback<tox_group_topic_change_cb> group_topic_change;
+    callback<tox_group_peer_join_cb> group_peer_join;
+    callback<tox_group_peer_exit_cb> group_peer_exit;
+    callback<tox_group_self_join_cb> group_self_join;
+    callback<tox_group_peerlist_update_cb> group_peerlist_update;
+    callback<tox_group_self_timeout_cb> group_self_timeout;
+    callback<tox_group_rejected_cb> group_rejected;
     callback<tox_friend_lossy_packet_cb> friend_lossy_packet;
     callback<tox_friend_lossless_packet_cb> friend_lossless_packet;
   } callbacks;
@@ -345,6 +357,90 @@ struct new_Tox
         }
     }
 
+    static void group_invite (Tox *m, int32_t friendnumber, const uint8_t *invite_data, uint16_t length, void *userdata)
+    {
+      auto self = static_cast<new_Tox *> (userdata);
+      auto cb = self->callbacks.group_invite;
+      cb.func (self, friendnumber, invite_data, length, userdata);
+    }
+
+    static void group_message (Tox *m, int groupnumber, uint32_t peernumber, const uint8_t *message, uint16_t length, void *userdata)
+    {
+      auto self = static_cast<new_Tox *> (userdata);
+      auto cb = self->callbacks.group_message;
+      cb.func (self, groupnumber, peernumber, message, length, cb.user_data);
+    }
+
+    static void group_private_message (Tox *m, int groupnumber, uint32_t peernumber, const uint8_t *message, uint16_t length, void *userdata)
+    {
+      auto self = static_cast<new_Tox *> (userdata);
+      auto cb = self->callbacks.group_private_message;
+      cb.func (self, groupnumber, peernumber, message, length, cb.user_data);
+    }
+
+    static void group_action (Tox *m, int groupnumber, uint32_t peernumber, const uint8_t *message, uint16_t length, void *userdata)
+    {
+      auto self = static_cast<new_Tox *> (userdata);
+      auto cb = self->callbacks.group_action;
+      cb.func (self, groupnumber, peernumber, message, length, cb.user_data);
+    }
+
+    static void group_nick_change (Tox *m, int groupnumber, uint32_t peernumber, const uint8_t *newnick, uint16_t length, void *userdata)
+    {
+      auto self = static_cast<new_Tox *> (userdata);
+      auto cb = self->callbacks.group_nick_change;
+      cb.func (self, groupnumber, peernumber, newnick, length, cb.user_data);
+    }
+
+    static void group_topic_change (Tox *m, int groupnumber, uint32_t peernumber, const uint8_t *topic, uint16_t length, void *userdata)
+    {
+      auto self = static_cast<new_Tox *> (userdata);
+      auto cb = self->callbacks.group_topic_change;
+      cb.func (self, groupnumber, peernumber, topic, length, cb.user_data);
+    }
+
+    static void group_peer_join (Tox *m, int groupnumber, uint32_t peernumber, void *userdata)
+    {
+      auto self = static_cast<new_Tox *> (userdata);
+      auto cb = self->callbacks.group_peer_join;
+      cb.func (self, groupnumber, peernumber, cb.user_data);
+    }
+
+    static void group_peer_exit (Tox *m, int groupnumber, uint32_t peernumber, const uint8_t *partmessage, uint16_t length, void *userdata)
+    {
+      auto self = static_cast<new_Tox *> (userdata);
+      auto cb = self->callbacks.group_peer_exit;
+      cb.func (self, groupnumber, peernumber, partmessage, length, cb.user_data);
+    }
+
+    static void group_self_join (Tox *m, int groupnumber, void *userdata)
+    {
+      auto self = static_cast<new_Tox *> (userdata);
+      auto cb = self->callbacks.group_self_join;
+      cb.func (self, groupnumber, cb.user_data);
+    }
+
+    static void group_peerlist_update (Tox *m, int groupnumber, void *userdata)
+    {
+      auto self = static_cast<new_Tox *> (userdata);
+      auto cb = self->callbacks.group_peerlist_update;
+      cb.func (self, groupnumber, cb.user_data);
+    }
+
+    static void group_self_timeout (Tox *m, int groupnumber, void *userdata)
+    {
+      auto self = static_cast<new_Tox *> (userdata);
+      auto cb = self->callbacks.group_self_timeout;
+      cb.func (self, groupnumber, cb.user_data);
+    }
+
+    static void group_rejected (Tox *m, int groupnumber, uint8_t type, void *userdata)
+    {
+      auto self = static_cast<new_Tox *> (userdata);
+      auto cb = self->callbacks.group_rejected;
+      cb.func (self, groupnumber, type, cb.user_data);
+    }
+
     static int lossy_packet (Tox *tox, int32_t friendnumber, const uint8_t *data, uint32_t length, void *userdata)
     {
 #if DEBUG_CALLBACKS
@@ -371,18 +467,30 @@ struct new_Tox
   new_Tox (Tox *tox)
     : tox (tox)
   {
-    tox_callback_friend_request    (tox, CB::friend_request   , this);
-    tox_callback_friend_message    (tox, CB::friend_message   , this);
-    tox_callback_friend_action     (tox, CB::friend_action    , this);
-    tox_callback_name_change       (tox, CB::name_change      , this);
-    tox_callback_status_message    (tox, CB::status_message   , this);
-    tox_callback_user_status       (tox, CB::user_status      , this);
-    tox_callback_typing_change     (tox, CB::typing_change    , this);
-    tox_callback_read_receipt      (tox, CB::read_receipt     , this);
-    tox_callback_connection_status (tox, CB::connection_status, this);
-    tox_callback_file_send_request (tox, CB::file_send_request, this);
-    tox_callback_file_control      (tox, CB::file_control     , this);
-    tox_callback_file_data         (tox, CB::file_data        , this);
+    tox_callback_friend_request         (tox, CB::friend_request       , this);
+    tox_callback_friend_message         (tox, CB::friend_message       , this);
+    tox_callback_friend_action          (tox, CB::friend_action        , this);
+    tox_callback_name_change            (tox, CB::name_change          , this);
+    tox_callback_status_message         (tox, CB::status_message       , this);
+    tox_callback_user_status            (tox, CB::user_status          , this);
+    tox_callback_typing_change          (tox, CB::typing_change        , this);
+    tox_callback_read_receipt           (tox, CB::read_receipt         , this);
+    tox_callback_connection_status      (tox, CB::connection_status    , this);
+    tox_callback_file_send_request      (tox, CB::file_send_request    , this);
+    tox_callback_group_invite           (tox, CB::group_invite         , this);
+    tox_callback_group_message          (tox, CB::group_message        , this);
+    tox_callback_group_private_message  (tox, CB::group_private_message, this);
+    tox_callback_group_action           (tox, CB::group_action         , this);
+    tox_callback_group_nick_change      (tox, CB::group_nick_change    , this);
+    tox_callback_group_topic_change     (tox, CB::group_topic_change   , this);
+    tox_callback_group_peer_join        (tox, CB::group_peer_join      , this);
+    tox_callback_group_peer_exit        (tox, CB::group_peer_exit      , this);
+    tox_callback_group_self_join        (tox, CB::group_self_join      , this);
+    tox_callback_group_peerlist_update  (tox, CB::group_peerlist_update, this);
+    tox_callback_group_self_timeout     (tox, CB::group_self_timeout   , this);
+    tox_callback_group_rejected         (tox, CB::group_rejected       , this);
+    tox_callback_file_control           (tox, CB::file_control         , this);
+    tox_callback_file_data              (tox, CB::file_data            , this);
   }
 
   void register_custom_packet_handlers (uint32_t friend_number)

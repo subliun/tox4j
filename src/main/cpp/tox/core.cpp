@@ -1008,6 +1008,226 @@ new_tox_callback_file_receive_chunk (new_Tox *tox, tox_file_receive_chunk_cb *fu
   tox->callbacks.file_receive_chunk = { function, user_data };
 }
 
+int
+new_tox_group_new(new_Tox *tox, const uint8_t *group_name, uint16_t length, TOX_ERR_GROUP_JOIN *error)
+{
+    if (length > TOX_MAX_NAME_LENGTH)
+    {
+      if (error) *error = TOX_ERR_GROUP_JOIN_FAILED; //TODO proper errors
+      return false;
+    }
+    if (length > 0 && group_name == nullptr)
+    {
+      if (error) *error = TOX_ERR_GROUP_JOIN_FAILED;
+      return false;
+    }
+
+  int group_number = tox_group_new(tox->tox, group_name, length);
+  if (group_number == -1) {
+    *error = TOX_ERR_GROUP_JOIN_FAILED;
+    return 0;
+  }
+
+  if (error) *error = TOX_ERR_GROUP_JOIN_OK;
+  return group_number;
+}
+
+int
+new_tox_group_new_join(new_Tox *tox, const uint8_t *invite_key, TOX_ERR_GROUP_JOIN *error)
+{
+  int group_number = tox_group_new_join(tox->tox, invite_key);
+  if (group_number == -1) {
+    *error = TOX_ERR_GROUP_JOIN_FAILED;
+    return 0;
+  }
+
+  if (error) *error = TOX_ERR_GROUP_JOIN_OK;
+  return group_number;
+}
+
+int
+new_tox_group_accept_invite(new_Tox *tox, const uint8_t *invite_data, uint16_t length, TOX_ERR_GROUP_JOIN *error)
+{
+  int group_number = tox_group_accept_invite(tox->tox, invite_data, length);
+  if (group_number == -1) {
+    *error = TOX_ERR_GROUP_JOIN_FAILED;
+    return 0;
+  }
+
+  if (error) *error = TOX_ERR_GROUP_JOIN_OK;
+  return group_number;
+}
+
+void
+new_tox_group_invite_friend(new_Tox *tox, int groupnumber, int32_t friendnumber)
+{
+  tox_group_invite_friend(tox->tox, groupnumber, friendnumber);
+}
+
+bool
+new_tox_group_delete(new_Tox *tox, int groupnumber, const uint8_t *partmessage, uint16_t length, TOX_ERR_GROUP_DELETE *error)
+{
+  int success = tox_group_delete(tox->tox, groupnumber, partmessage, length);
+
+  if (success == -1) {
+    if (error) *error = TOX_ERR_GROUP_DELETE_FAILED;
+    return false;
+  } else {
+    if (error) *error = TOX_ERR_GROUP_DELETE_OK;
+    return true;
+  }
+}
+
+bool
+new_tox_group_message_send(const new_Tox *tox, int groupnumber, const uint8_t *message, uint16_t length, TOX_ERR_GROUP_SEND *error) {
+  int success = tox_group_message_send(tox->tox, groupnumber, message, length);
+  if (success == -1) {
+    if (error) *error = TOX_ERR_GROUP_SEND_FAILED;
+    return false;
+  } else {
+    if (error) *error = TOX_ERR_GROUP_SEND_OK;
+    return true;
+  }
+}
+
+bool
+new_tox_group_private_message_send(const new_Tox *tox, int groupnumber, uint32_t peernumber, const uint8_t *message, uint16_t length, TOX_ERR_GROUP_SEND *error) {
+  int success = tox_group_private_message_send(tox->tox, groupnumber, peernumber, message, length);
+  if (success == -1) {
+    if (error) *error = TOX_ERR_GROUP_SEND_FAILED;
+    return false;
+  } else {
+    if (error) *error = TOX_ERR_GROUP_SEND_OK;
+    return true;
+  }
+}
+
+bool
+new_tox_group_action_send(const new_Tox *tox, int groupnumber, const uint8_t *message, uint16_t length, TOX_ERR_GROUP_SEND *error) {
+    int success = tox_group_action_send(tox->tox, groupnumber, message, length);
+    if (success == -1) {
+      if (error) *error = TOX_ERR_GROUP_SEND_FAILED;
+      return false;
+    } else {
+      if (error) *error = TOX_ERR_GROUP_SEND_OK;
+      return true;
+    }
+}
+
+/*
+int
+new_tox_group_set_self_name(new_Tox *tox, int groupnumber, const uint8_t *name, uint16_t length, TOX_ERR_GROUP_SET_NAME *error);
+
+int
+new_tox_group_get_peer_name(const new_Tox *tox, int groupnumber, uint32_t peernumber, uint8_t *name, TOX_ERR_GROUP_QUERY *error);
+
+int
+new_tox_group_get_self_name(const new_Tox *tox, int groupnumber, uint8_t *name, TOX_ERR_GROUP_QUERY *error);
+
+int
+new_tox_group_set_topic(new_Tox *tox, int groupnumber, const uint8_t *topic, uint16_t length, TOX_ERR_GROUP_SET *error);
+
+int
+new_tox_group_get_topic(const new_Tox *tox, int groupnumber, uint8_t *topic, TOX_ERR_GROUP_QUERY *error);
+
+int
+new_tox_group_get_group_name(const new_Tox *tox, int groupnumber, uint8_t *groupname, TOX_ERR_GROUP_QUERY *error);
+
+int
+new_tox_group_set_status(new_Tox *tox, int groupnumber, uint8_t status_type, TOX_ERR_GROUP_SET *error);
+
+int
+uint8_t new_tox_group_get_status(const new_Tox *tox, int groupnumber, uint32_t peernumber, TOX_ERR_GROUP_QUERY *error);
+
+int
+uint8_t new_tox_group_get_role(const new_Tox *tox, int groupnumber, uint32_t peernumber, TOX_ERR_GROUP_QUERY *error);
+
+int
+new_tox_group_get_invite_key(const new_Tox *tox, int groupnumber, uint8_t *dest, TOX_ERR_GROUP_QUERY *error);
+
+int
+new_tox_group_get_names(const new_Tox *tox, int groupnumber, uint8_t nicks[][TOX_MAX_NAME_LENGTH], uint16_t lengths[], uint32_t num_peers, TOX_ERR_GROUP_QUERY *error);
+
+int
+new_tox_group_get_number_peers(const new_Tox *tox, int groupnumber, TOX_ERR_GROUP_QUERY *error);
+
+int
+new_tox_group_toggle_ignore(new_Tox *tox, int groupnumber, uint32_t peernumber, uint8_t ignore, TOX_ERR_GROUP_SET *error);
+*/
+
+void
+new_tox_callback_group_invite (new_Tox *tox, tox_group_invite_cb *function, void *user_data)
+{
+  tox->callbacks.group_invite = { function, user_data };
+}
+
+void
+new_tox_callback_group_message (new_Tox *tox, tox_group_message_cb *function, void *user_data)
+{
+  tox->callbacks.group_message = { function, user_data };
+}
+
+void
+new_tox_callback_group_private_message (new_Tox *tox, tox_group_private_message_cb *function, void *user_data)
+{
+  tox->callbacks.group_private_message = { function, user_data };
+}
+
+void
+new_tox_callback_group_action (new_Tox *tox, tox_group_action_cb *function, void *user_data)
+{
+  tox->callbacks.group_action = { function, user_data };
+}
+
+void
+new_tox_callback_group_nick_change (new_Tox *tox, tox_group_nick_change_cb *function, void *user_data)
+{
+  tox->callbacks.group_nick_change = { function, user_data };
+}
+
+void
+new_tox_callback_group_topic_change (new_Tox *tox, tox_group_topic_change_cb *function, void *user_data)
+{
+  tox->callbacks.group_topic_change = { function, user_data };
+}
+
+void
+new_tox_callback_group_peer_join (new_Tox *tox, tox_group_peer_join_cb *function, void *user_data)
+{
+  tox->callbacks.group_peer_join = { function, user_data };
+}
+
+void
+new_tox_callback_group_peer_exit (new_Tox *tox, tox_group_peer_exit_cb *function, void *user_data)
+{
+  tox->callbacks.group_peer_exit = { function, user_data };
+}
+
+void
+new_tox_callback_group_self_join (new_Tox *tox, tox_group_self_join_cb *function, void *user_data)
+{
+  tox->callbacks.group_self_join = { function, user_data };
+}
+
+void
+new_tox_callback_group_peerlist_update (new_Tox *tox, tox_group_peerlist_update_cb *function, void *user_data)
+{
+  tox->callbacks.group_peerlist_update = { function, user_data };
+}
+
+void
+new_tox_callback_group_self_timeout (new_Tox *tox, tox_group_self_timeout_cb *function, void *user_data)
+{
+  tox->callbacks.group_self_timeout = { function, user_data };
+}
+
+void
+new_tox_callback_group_rejected (new_Tox *tox, tox_group_rejected_cb *function, void *user_data)
+{
+  tox->callbacks.group_rejected = { function, user_data };
+}
+
+
 static bool
 new_tox_send_custom_packet (int send (Tox const *tox, int32_t friendnumber, uint8_t const *data, uint32_t length),
                             new_Tox *tox, uint32_t friend_number, uint8_t const *data, size_t length, TOX_ERR_SEND_CUSTOM_PACKET *error)

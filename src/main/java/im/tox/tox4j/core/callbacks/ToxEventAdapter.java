@@ -1,10 +1,7 @@
 package im.tox.tox4j.core.callbacks;
 
 import im.tox.tox4j.annotations.NotNull;
-import im.tox.tox4j.core.enums.ToxConnection;
-import im.tox.tox4j.core.enums.ToxFileControl;
-import im.tox.tox4j.core.enums.ToxFileKind;
-import im.tox.tox4j.core.enums.ToxStatus;
+import im.tox.tox4j.core.enums.*;
 
 public class ToxEventAdapter implements ToxEventListener {
     @Override public void connectionStatus(@NotNull ToxConnection connectionStatus) { }
@@ -23,4 +20,16 @@ public class ToxEventAdapter implements ToxEventListener {
     @Override public void friendLosslessPacket(int friendNumber, @NotNull byte[] data) { }
     @Override public void friendLossyPacket(int friendNumber, @NotNull byte[] data) { }
     @Override public void readReceipt(int friendNumber, int messageId) { }
+    @Override public void groupAction(int groupNumber, int peerNumber, int timeDelta, @NotNull byte[] message) {}
+    @Override public void groupInvite(int friendNumber, @NotNull byte[] invite_data) { }
+    @Override public void groupInviteRejected(int groupNumber, ToxGroupJoinRejected rejectedReason) { }
+    @Override public void groupMessage(int groupNumber, int peerNumber, int timeDelta, @NotNull byte[] message) { }
+    @Override public void groupNickChange(int groupNumber, int peerNumber, @NotNull byte[] newNick) { }
+    @Override public void groupPeerExit(int groupNumber, int peerNumber, @NotNull byte[] partMessage) { }
+    @Override public void groupPeerJoin(int groupNumber, int peerNumber) { }
+    @Override public void groupPeerlistUpdate(int groupNumber) { }
+    @Override public void groupPrivateMessage(int groupNumber, int peerNumber, int timeDelta, @NotNull byte[] message) { }
+    @Override public void groupSelfJoin(int groupNumber) { }
+    @Override public void groupSelfTimeout(int groupNumber) { }
+    @Override public void groupTopicChange(int groupNumber, int peerNumber, @NotNull byte[] topic) { }
 }

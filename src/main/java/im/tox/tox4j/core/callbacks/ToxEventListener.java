@@ -1,5 +1,7 @@
 package im.tox.tox4j.core.callbacks;
 
+import im.tox.tox4j.core.proto.Core;
+
 public interface ToxEventListener extends
         ConnectionStatusCallback,
         FileControlCallback,
@@ -16,6 +18,18 @@ public interface ToxEventListener extends
         FriendTypingCallback,
         FriendLosslessPacketCallback,
         FriendLossyPacketCallback,
-        ReadReceiptCallback
+        ReadReceiptCallback,
+        GroupInviteCallback,
+        GroupMessageCallback,
+        GroupPrivateMessageCallback,
+        GroupActionCallback,
+        GroupNickChangeCallback,
+        GroupTopicChangeCallback,
+        GroupPeerJoinCallback,
+        GroupPeerExitCallback,
+        GroupSelfJoinCallback,
+        GroupPeerlistUpdateCallback,
+        GroupSelfTimeoutCallback,
+        GroupInviteRejectedCallback
 {
 }
