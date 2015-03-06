@@ -9,13 +9,15 @@ import im.tox.tox4j.core.exceptions.ToxBootstrapException;
 import im.tox.tox4j.core.exceptions.ToxFriendAddException;
 import im.tox.tox4j.core.exceptions.ToxNewException;
 
+import java.util.Random;
+
 public final class Main {
 
     public static void main(String[] args) {
         final ToxCoreImpl tox;
         try {
             tox = new ToxCoreImpl(new ToxOptions());
-            tox.setName("tox4jgrouptest".getBytes());
+            tox.setName("DiceBot".getBytes());
             tox.setStatus(ToxStatus.NONE);
 
             new Thread(new Runnable() {
@@ -24,7 +26,7 @@ public final class Main {
                     while (true) {
                         tox.iteration();
                         try {
-                            Thread.sleep(tox.iterationInterval());
+                            Thread.sleep(20);
                         } catch (InterruptedException e) {
                             e.printStackTrace();
                         }
@@ -33,6 +35,7 @@ public final class Main {
             }).start();
 
             try {
+                //connect 192.254.75.104 33445 6058FF1DA1E013AD4F829CBE8E5DDFD30A4DE55901B0997832E3E8A64E19026C
                 tox.bootstrap("192.254.75.104", 33445, hexStringToBytes("6058FF1DA1E013AD4F829CBE8E5DDFD30A4DE55901B0997832E3E8A64E19026C"));
             } catch (ToxBootstrapException e) {
                 e.printStackTrace();
@@ -41,17 +44,7 @@ public final class Main {
                 @Override
                 public void connectionStatus(@NotNull ToxConnection connectionStatus) {
                     System.out.println(connectionStatus);
-                    try {
-                        Thread.sleep(5000);
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
-                    try {
-                        tox.addFriend(hexStringToBytes("1068EBF134EC891FDDB78A30D3C614DCFADEC0F98A57546904F2408092B40161108164E3912B"), "u wot m8".getBytes());
-                    } catch (ToxFriendAddException e) {
-                        e.printStackTrace();
-                    }
-                    int groupNumber = tox.joinGroup(hexStringToBytes("E64E9C45758CF80BC70699F4D93CAB305997A939365D6233715CC4824AA35AFC"));
+                    int groupNumber = tox.joinGroup(hexStringToBytes("6AF9F153A36308DC42388D25891A034D9567C91F133AC6A4224F2718AF4C5B54"));
                     System.out.println("joined group with number " + groupNumber);
                     //int groupNumber2 = tox.joinGroup(hexStringToBytes("744F3C356FEB4D49848CF9D8B8B62E0986BE23531E2A565608220230E44BA432B0D1C0B973C16CD60F7DB6EE93CDF3315F2A30AD4843B7EC24040C89B30F099E"));
                     //System.out.println("joined group2 with number " + groupNumber2);
@@ -62,11 +55,18 @@ public final class Main {
                 @Override
                 public void groupMessage(int groupNumber, int peerNumber, int timeDelta, @NotNull byte[] message) {
                     String strMsg = new String(message);
-                    System.out.println("got a message from group " + groupNumber + ", peer " + peerNumber + " that says :\n" + new String(message));
+                    System.out.println("got a message from group " + new String(tox.getGroupName(groupNumber)) + ", peer " + peerNumber + " that says :\n" + new String(message));
+                    System.out.println("group id is " + bytesToHexString(tox.getGroupChatId(groupNumber)));
                     if (strMsg.startsWith("msg: ")) {
                         tox.sendGroupMessage(groupNumber, message);
                     } else if (strMsg.startsWith("kill: ")) {
                         tox.deleteGroup(groupNumber, "I'm dying".getBytes());
+                    } else if (strMsg.startsWith("nick:")) {
+                        tox.setGroupSelfName(groupNumber, strMsg.replace("nick: ", "").getBytes());
+                    } else if (strMsg.startsWith("topic:")) {
+                        tox.setGroupTopic(groupNumber, strMsg.replace("topic: ", "").getBytes());
+                    } else if (strMsg.startsWith("^roll")) {
+                        tox.sendGroupMessage(groupNumber, (new String(tox.getGroupPeerName(groupNumber, peerNumber)) + " rolled a " + (new Random().nextInt(6) + 1)).getBytes());
                     }
                 }
             });
@@ -92,6 +92,14 @@ public final class Main {
                 }
             });
 
+            tox.callbackGroupPeerlistUpdate(new GroupPeerlistUpdateCallback() {
+                @Override
+                public void groupPeerlistUpdate(int groupNumber) {
+                    for (int i = 0; i < tox.getGroupNumberPeers(groupNumber); i++) {
+                        System.out.println("user " + i + " name " + new String(tox.getGroupPeerName(groupNumber, i)));
+                    }
+                }
+            });
             tox.callbackGroupTopicChange(new GroupTopicChangeCallback() {
                 @Override
                 public void groupTopicChange(int groupNumber, int peerNumber, @NotNull byte[] topic) {
@@ -121,4 +129,15 @@ public final class Main {
         return data;
     }
 
+    private static final char[] hexArray = "0123456789ABCDEF".toCharArray();
+
+    public static String bytesToHexString(byte[] bytes) {
+        char[] hexChars = new char[bytes.length * 2];
+        for (int j = 0; j < bytes.length; j++) {
+            int v = bytes[j] & 0xFF;
+            hexChars[j * 2] = hexArray[v >>> 4];
+            hexChars[j * 2 + 1] = hexArray[v & 0x0F];
+        }
+        return new String(hexChars);
+    }
 }

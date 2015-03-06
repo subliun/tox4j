@@ -30,7 +30,7 @@ val androidSettings = Seq(
 )
 
 // Choose which one to build:
-val ANDROID = false
+val ANDROID = true
 
 if (ANDROID)
   androidSettings

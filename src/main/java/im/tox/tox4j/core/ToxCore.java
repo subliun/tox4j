@@ -3,9 +3,7 @@ package im.tox.tox4j.core;
 import im.tox.tox4j.annotations.NotNull;
 import im.tox.tox4j.annotations.Nullable;
 import im.tox.tox4j.core.callbacks.*;
-import im.tox.tox4j.core.enums.ToxFileControl;
-import im.tox.tox4j.core.enums.ToxFileKind;
-import im.tox.tox4j.core.enums.ToxStatus;
+import im.tox.tox4j.core.enums.*;
 import im.tox.tox4j.core.exceptions.*;
 import im.tox.tox4j.core.proto.Core;
 
@@ -368,6 +366,61 @@ public interface ToxCore extends Closeable {
     /** Sends a groupchat action message to groupnumber. Messages should be split at TOX_MAX_MESSAGE_LENGTH bytes.
      */
     void sendGroupAction(int groupNumber, @NotNull byte[] message);
+
+    /** Sets your name for groupnumber. length should be no larger than TOX_MAX_NAME_LENGTH bytes.
+     */
+    void setGroupSelfName(int groupNumber, byte[] name);
+
+    /**
+     * Get peernumber's name in groupnumber's group chat.
+     */
+    byte[] getGroupPeerName(int groupNumber, int peerNumber);
+
+    /**
+     * Get your own name for groupnumber's group.
+     */
+    byte[] getGroupSelfName(int groupNumber);
+
+    /**
+     * Sets groupnumber's topic.
+     */
+    void setGroupTopic(int groupNumber, byte[] topic);
+
+    /** Gets groupnumber's topic.
+     */
+    byte[] getGroupTopic(int groupNumber);
+
+    /** Gets groupnumber's group name.
+     */
+    byte[] getGroupName(int groupNumber);
+
+    /** Sets your status for groupnumber.
+     */
+    void setGroupSelfStatus(int groupNumber, ToxGroupStatus status);
+
+    /** Get peernumber's status in groupnumber's group chat.
+     *
+     * @return a TOX_GROUP_STATUS on success.
+     * @return TOX_GS_INVALID on failure.
+     */
+    ToxGroupStatus getGroupPeerStatus(int groupNumber, int peernumber);
+
+    /* Get peernumber's group role in groupnumber's group chat.
+      *
+      * @return a TOX_GROUP_ROLE on success.
+      * @return TOX_GR_INVALID on failure.
+      */
+    ToxGroupRole getGroupPeerRole(int groupNumber, int peernumber);
+
+    /**
+     * Get the chat id of the groupchat from the groupnumber.
+     */
+    byte[] getGroupChatId(int groupNumber);
+
+    /**
+     * @return the number of peers in groupnumber.
+     */
+    int getGroupNumberPeers(int groupNumber);
 
     void callbackGroupInvite(@Nullable GroupInviteCallback callback);
 

@@ -22,7 +22,21 @@ CLONE() {
     git checkout master
     git reset --hard origin/master
   else
-    git clone "$1/$2".git $3
+    git clone "$1/$2".git $3 $4
+    cd $2
+  fi
+}
+
+CLONEBETTER() {
+  if [ -d $2 ]; then
+    cd $2
+    git fetch
+    git clean -fdx
+    git reset --hard
+    git checkout new_groupchats
+    git reset --hard origin/new_groupchats
+  else
+    git clone "$1/$2".git $3 $4
     cd $2
   fi
 }
@@ -100,14 +114,16 @@ INSTALL() {
 )
 # toxcore
 (
-  CLONE https://github.com/irungentoo toxcore --depth=1
-  INSTALL toxcore --disable-rt --disable-testing --disable-tests
+  #CLONEBETTER https://github.com/Jfreegman toxcore --depth=1 --branch=new_groupchats
+  cd toxcore
+  ls
+  INSTALL toxcore --disable-rt --disable-testing --disable-tests --disable-epoll
 )
 # protobuf
 (
   CLONE https://github.com/google protobuf
   #git checkout tags/v2.6.1
-  git checkout 0c995c930067241b40b10b0b01504c784cade03e
+  git checkout bba83652e1be610bdb7ee1566ad18346d98b843c
   patch -p1 < ../protobuf.patch
   INSTALL protobuf --with-protoc=protoc
 )

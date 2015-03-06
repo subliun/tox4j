@@ -722,6 +722,71 @@ public final class ToxCoreImpl extends AbstractToxCore {
     @Override
     public void sendGroupAction(int groupNumber, @NotNull byte[] message) { toxGroupActionSend(instanceNumber, groupNumber, message); }
 
+    private static native void toxGroupSetSelfName(int instanceNumber, int groupNumber, @NotNull byte[] name);
+
+    @Override
+    public void setGroupSelfName(int groupNumber, @NotNull byte[] name) { toxGroupSetSelfName(instanceNumber, groupNumber, name); }
+
+    private static native byte[] toxGroupGetPeerName(int instanceNumber, int groupNumber, int peerNumber);
+
+    @NotNull
+    @Override
+    public byte[] getGroupPeerName(int groupNumber, int peerNumber) { return toxGroupGetPeerName(instanceNumber, groupNumber, peerNumber); }
+
+    private static native byte[] toxGroupGetSelfName(int instanceNumber, int groupNumber);
+
+    @NotNull
+    @Override
+    public byte[] getGroupSelfName(int groupNumber) { return toxGroupGetSelfName(instanceNumber, groupNumber); }
+
+    private static native void toxGroupSetTopic(int instanceNumber, int groupNumber, byte[] topic);
+
+    @Override
+    public void setGroupTopic(int groupNumber, byte[] topic) { toxGroupSetTopic(instanceNumber, groupNumber, topic); }
+
+    private static native byte[] toxGroupGetTopic(int instanceNumber, int groupNumber);
+
+    @NotNull
+    @Override
+    public byte[] getGroupTopic(int groupNumber) { return toxGroupGetTopic(instanceNumber, groupNumber); }
+
+    private static native byte[] toxGroupGetGroupName(int instanceNumber, int groupNumber);
+
+    @NotNull
+    @Override
+    public byte[] getGroupName(int groupNumber) { return toxGroupGetGroupName(instanceNumber, groupNumber); }
+
+    private static native void toxGroupSetStatus(int instanceNumber, int groupNumber, int status);
+
+    @Override
+    public void setGroupSelfStatus(int groupNumber, ToxGroupStatus status) {
+        toxGroupSetStatus(instanceNumber, groupNumber, status.ordinal());
+    }
+
+    private static native int toxGroupGetStatus(int instanceNumber, int groupNumber, int peerNumber);
+
+    @Override
+    public ToxGroupStatus getGroupPeerStatus(int groupNumber, int peerNumber) {
+        return ToxGroupStatus.values()[toxGroupGetStatus(instanceNumber, groupNumber, peerNumber)];
+    }
+
+    private static native int toxGroupGetRole(int instanceNumber,int groupNumber, int peerNumber);
+
+    @Override
+    public ToxGroupRole getGroupPeerRole(int groupNumber, int peerNumber) {
+        return ToxGroupRole.values()[toxGroupGetRole(instanceNumber, groupNumber, peerNumber)];
+    }
+
+    private static native byte[] toxGroupGetChatId(int instanceNumber, int groupNumber);
+
+    @Override
+    public byte[] getGroupChatId(int groupNumber) { return toxGroupGetChatId(instanceNumber, groupNumber); }
+
+    private static native int toxGroupGetNumberPeers(int instanceNumber, int groupNumber);
+
+    @Override
+    public int getGroupNumberPeers(int groupNumber) { return toxGroupGetNumberPeers(instanceNumber, groupNumber); }
+
 
     @Override
     public void callbackGroupInvite(@Nullable GroupInviteCallback callback) { this.groupInviteCallback = callback; }

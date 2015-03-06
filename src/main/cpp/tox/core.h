@@ -1719,6 +1719,15 @@ typedef enum {
 } TOX_GROUP_STATUS;
 
 typedef enum {
+  TOX_GR_FOUNDER,
+  TOX_GR_OP,
+  TOX_GR_USER,
+  TOX_GR_OBSERVER,
+  TOX_GR_BANNED,
+  TOX_GR_INVALID
+} TOX_GROUP_ROLE;
+
+typedef enum {
   TOX_GJ_NICK_TAKEN,
   TOX_GJ_GROUP_FULL,
   TOX_GJ_INVITES_DISABLED,
@@ -1810,7 +1819,7 @@ typedef enum TOX_ERR_GROUP_SET_NAME {
 * Return -1 on failure.
 * Return -2 if nick is already taken by another group member
 */
-void tox_group_set_self_name(Tox *tox, int groupnumber, const uint8_t *name, uint16_t length, TOX_ERR_GROUP_SET_NAME *error);
+bool tox_group_set_self_name(Tox *tox, int groupnumber, const uint8_t *name, uint16_t length, TOX_ERR_GROUP_SET_NAME *error);
 
 typedef enum TOX_ERR_GROUP_QUERY {
   TOX_ERR_GROUP_QUERY_OK,
@@ -1825,7 +1834,9 @@ size_t tox_group_get_peer_name_size (new_Tox const *tox, int groupnumber, uint32
 * Return length of name on success.
 * Reutrn -1 on failure.
 */
-void tox_group_get_peer_name(const Tox *tox, int groupnumber, uint32_t peernumber, uint8_t *name, TOX_ERR_GROUP_QUERY *error);
+bool tox_group_get_peer_name(const Tox *tox, int groupnumber, uint32_t peernumber, uint8_t *name);
+
+size_t tox_group_get_self_name_size (new_Tox const *tox, int groupnumber);
 
 /* Get your own name for groupnumber's group.
 * name buffer must be at least TOX_MAX_NAME_LENGTH bytes.
@@ -1833,7 +1844,7 @@ void tox_group_get_peer_name(const Tox *tox, int groupnumber, uint32_t peernumbe
 * Return length of name on success.
 * Reutrn -1 on failure.
 */
-void tox_group_get_self_name(const Tox *tox, int groupnumber, uint8_t *name, TOX_ERR_GROUP_QUERY *error);
+bool tox_group_get_self_name(const Tox *tox, int groupnumber, uint8_t *name);
 
 typedef enum TOX_ERR_GROUP_SET {
   TOX_ERR_GROUP_SET_OK,
@@ -1842,7 +1853,7 @@ typedef enum TOX_ERR_GROUP_SET {
 
 /* Changes groupnumber's topic.
 */
-void tox_group_set_topic(Tox *tox, int groupnumber, const uint8_t *topic, uint16_t length, TOX_ERR_GROUP_SET *error);
+bool tox_group_set_topic(Tox *tox, int groupnumber, const uint8_t *topic, uint16_t length, TOX_ERR_GROUP_SET *error);
 
 size_t tox_group_get_topic_size (new_Tox const *tox, int groupnumber);
 
@@ -1851,31 +1862,31 @@ size_t tox_group_get_topic_size (new_Tox const *tox, int groupnumber);
 * Return topic length on success.
 * Return -1 on failure.
 */
-void tox_group_get_topic(const Tox *tox, int groupnumber, uint8_t *topic, TOX_ERR_GROUP_QUERY *error);
+bool tox_group_get_topic(const Tox *tox, int groupnumber, uint8_t *topic);
 
 size_t tox_group_get_group_name_size (new_Tox const *tox, int groupnumber);
 
 /* Gets groupnumber's group name. groupname buffer must be at least TOX_MAX_GROUP_NAME_LENGTH bytes.
 */
-void tox_group_get_group_name(const Tox *tox, int groupnumber, uint8_t *groupname, TOX_ERR_GROUP_QUERY *error);
+bool tox_group_get_group_name(const Tox *tox, int groupnumber, uint8_t *groupname);
 
 /* Sets your status for groupnumber.
 */
-void tox_group_set_status(Tox *tox, int groupnumber, uint8_t status_type, TOX_ERR_GROUP_SET *error);
+bool tox_group_set_status(Tox *tox, int groupnumber, uint8_t status_type, TOX_ERR_GROUP_SET *error);
 
 /* Get peernumber's status in groupnumber's group chat.
 *
 * Returns a TOX_GROUP_STATUS on success.
 * Returns TOX_GS_INVALID on failure.
 */
-uint8_t tox_group_get_status(const Tox *tox, int groupnumber, uint32_t peernumber, TOX_ERR_GROUP_QUERY *error);
+TOX_GROUP_STATUS tox_group_get_status(const Tox *tox, int groupnumber, uint32_t peernumber);
 
 /* Get peernumber's group role in groupnumber's group chat.
 *
 * Returns a TOX_GROUP_ROLE on success.
 * Returns TOX_GR_INVALID on failure.
 */
-uint8_t tox_group_get_role(const Tox *tox, int groupnumber, uint32_t peernumber, TOX_ERR_GROUP_QUERY *error);
+TOX_GROUP_ROLE tox_group_get_role(const Tox *tox, int groupnumber, uint32_t peernumber);
 
 /* Get invite key for the groupchat from groupnumber.
 * The result is stored in 'dest' which must have space for TOX_GROUP_CHAT_ID_SIZE bytes.

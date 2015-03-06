@@ -48,3 +48,21 @@ JNIEXPORT void JNICALL Java_im_tox_tox4j_ToxCoreImpl_toxGroupActionSend
     return with_instance(env, instanceNumber, "GroupActionSend", handle_send_error, [](bool) {
     }, tox_group_action_send, groupNumber, message_array.data(), message_array.size());
 }
+
+/*
+ * Class:     im_tox_tox4jToxCoreImpl
+ * Method:    toxGroupSetStatus
+ * Signature: (II)V
+ */
+JNIEXPORT void JNICALL Java_im_tox_tox4j_ToxCoreImpl_toxGroupSetStatus
+  (JNIEnv *env, jclass, jint instanceNumber, jint groupNumber, jint status)
+{
+    return with_instance(env, instanceNumber, "GroupSetStatus", [](TOX_ERR_GROUP_SET error) {
+        switch (error) {
+            success_case(GROUP_SET);
+            failure_case(GROUP_SET, FAILED);
+        }
+        return unhandled();
+    }, [](bool) {
+    }, tox_group_set_status, groupNumber, status);
+}

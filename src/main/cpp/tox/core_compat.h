@@ -75,6 +75,15 @@
 #define TOX_GJ_GROUP_FULL new_TOX_GJ_GROUP_FULL
 #define TOX_GJ_INVITES_DISABLED new_TOX_GJ_INVITES_DISABLED
 #define TOX_GJ_INVITE_FAILED new_TOX_GJ_INVITE_FAILED
+
+#define TOX_GROUP_ROLE  new_TOX_GROUP_ROLE
+#define TOX_GR_FOUNDER  new_TOX_GR_FOUNDER
+#define TOX_GR_OP       new_TOX_GR_OP
+#define TOX_GR_USER     new_TOX_GR_USER
+#define TOX_GR_OBSERVER new_TOX_GR_OBSERVER
+#define TOX_GR_BANNED   new_TOX_GR_BANNED
+#define TOX_GR_INVALID  new_TOX_GR_INVALID
+
 #define tox_group_new new_tox_group_new
 #define tox_group_new_join new_tox_group_new_join
 #define tox_group_accept_invite new_tox_group_accept_invite

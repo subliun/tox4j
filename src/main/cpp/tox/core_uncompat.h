@@ -77,6 +77,14 @@
 #undef TOX_GJ_INVITES_DISABLED
 #undef TOX_GJ_INVITE_FAILED
 
+#undef TOX_GROUP_ROLE
+#undef TOX_GR_FOUNDER
+#undef TOX_GR_OP
+#undef TOX_GR_USER
+#undef TOX_GR_OBSERVER
+#undef TOX_GR_BANNED
+#undef TOX_GR_INVALID
+
 #undef tox_group_new
 #undef tox_group_new_join
 #undef tox_group_accept_invite
