@@ -60,7 +60,7 @@ public final class ToxCoreImpl extends AbstractToxCore {
     private GroupSelfJoinCallback groupSelfJoinCallback;
     private GroupPeerlistUpdateCallback groupPeerlistUpdateCallback;
     private GroupSelfTimeoutCallback groupSelfTimeoutCallback;
-    private GroupInviteRejectedCallback groupInviteRejectedCallback;
+    private GroupJoinRejectedCallback groupJoinRejectedCallback;
     private FriendLossyPacketCallback friendLossyPacketCallback;
     private FriendLosslessPacketCallback friendLosslessPacketCallback;
 
@@ -397,9 +397,9 @@ public final class ToxCoreImpl extends AbstractToxCore {
                 groupSelfTimeoutCallback.groupSelfTimeout(groupSelfTimeout.getGroupNumber());
             }
         }
-        if (groupInviteRejectedCallback != null) {
+        if (groupJoinRejectedCallback != null) {
             for (Core.GroupRejected groupRejected : toxEvents.getGroupRejectedList()) {
-                groupInviteRejectedCallback.groupInviteRejected(groupRejected.getGroupNumber(), convert(groupRejected.getType()));
+                groupJoinRejectedCallback.groupJoinRejected(groupRejected.getGroupNumber(), convert(groupRejected.getType()));
             }
         }
         if (friendLossyPacketCallback != null) {
@@ -759,7 +759,7 @@ public final class ToxCoreImpl extends AbstractToxCore {
     public void callbackGroupSelfTimeout(@Nullable GroupSelfTimeoutCallback callback) { this.groupSelfTimeoutCallback = callback; }
 
     @Override
-    public void callbackGroupInviteRejected(@Nullable GroupInviteRejectedCallback callback) { this.groupInviteRejectedCallback = callback; }
+    public void callbackGroupJoinRejected(@Nullable GroupJoinRejectedCallback callback) { this.groupJoinRejectedCallback = callback; }
 
     private static native void toxSendLossyPacket(int instanceNumber, int friendNumber, @NotNull byte[] data) throws ToxSendCustomPacketException;
 

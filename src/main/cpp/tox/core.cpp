@@ -1025,7 +1025,7 @@ new_tox_group_new(new_Tox *tox, const uint8_t *group_name, uint16_t length, TOX_
   int group_number = tox_group_new(tox->tox, group_name, length);
   if (group_number == -1) {
     *error = TOX_ERR_GROUP_JOIN_FAILED;
-    return 0;
+    return -1;
   }
 
   if (error) *error = TOX_ERR_GROUP_JOIN_OK;
@@ -1038,7 +1038,7 @@ new_tox_group_new_join(new_Tox *tox, const uint8_t *invite_key, TOX_ERR_GROUP_JO
   int group_number = tox_group_new_join(tox->tox, invite_key);
   if (group_number == -1) {
     *error = TOX_ERR_GROUP_JOIN_FAILED;
-    return 0;
+    return -1;
   }
 
   if (error) *error = TOX_ERR_GROUP_JOIN_OK;
@@ -1051,7 +1051,7 @@ new_tox_group_accept_invite(new_Tox *tox, const uint8_t *invite_data, uint16_t l
   int group_number = tox_group_accept_invite(tox->tox, invite_data, length);
   if (group_number == -1) {
     *error = TOX_ERR_GROUP_JOIN_FAILED;
-    return 0;
+    return -1;
   }
 
   if (error) *error = TOX_ERR_GROUP_JOIN_OK;
@@ -1114,43 +1114,154 @@ new_tox_group_action_send(const new_Tox *tox, int groupnumber, const uint8_t *me
     }
 }
 
-/*
-int
-new_tox_group_set_self_name(new_Tox *tox, int groupnumber, const uint8_t *name, uint16_t length, TOX_ERR_GROUP_SET_NAME *error);
 
-int
-new_tox_group_get_peer_name(const new_Tox *tox, int groupnumber, uint32_t peernumber, uint8_t *name, TOX_ERR_GROUP_QUERY *error);
+/* void
+new_tox_group_set_self_name(new_Tox *tox, int groupnumber, const uint8_t *name, uint16_t length, TOX_ERR_GROUP_SET_NAME *error) {
+    int success = tox_group_set_self_name(tox->tox, groupnumber, name, length);
+    if (success == -1) {
+      if (error) *error = TOX_ERR_GROUP_SET_NAME_FAILED;
+    } else if (success == -2) {
+      if (error) *error = TOX_ERR_GROUP_SET_NAME_TAKEN;
+    } else {
+      if (error) *error = TOX_ERR_GROUP_SET_NAME_OK;
+    }
+}
 
-int
-new_tox_group_get_self_name(const new_Tox *tox, int groupnumber, uint8_t *name, TOX_ERR_GROUP_QUERY *error);
+void
+new_tox_group_get_self_name(const new_Tox *tox, int groupnumber, uint8_t *name, TOX_ERR_GROUP_QUERY *error) {
+    int self_name_length = tox_group_get_self_name(tox->tox, groupnumber, name);
+    if (self_name_length == -1) {
+      if (error) *error = TOX_ERR_GROUP_QUERY_FAILED;
+    } else {
+      if (error) *error = TOX_ERR_GROUP_QUERY_OK;
+    }
 
-int
-new_tox_group_set_topic(new_Tox *tox, int groupnumber, const uint8_t *topic, uint16_t length, TOX_ERR_GROUP_SET *error);
+    return self_name_length;
+}
 
-int
-new_tox_group_get_topic(const new_Tox *tox, int groupnumber, uint8_t *topic, TOX_ERR_GROUP_QUERY *error);
+void
+new_tox_group_get_peer_name(const new_Tox *tox, int groupnumber, uint32_t peernumber, uint8_t *name, TOX_ERR_GROUP_QUERY *error) {
+    int success = tox_group_get_peer_name(tox->tox, groupnumber, peernumber, name);
+    if (success == -1) {
+      if (error) *error = TOX_ERR_GROUP_QUERY_FAILED;
+    } else {
+      if (error) *error = TOX_ERR_GROUP_QUERY_OK;
+    }
+}
 
-int
-new_tox_group_get_group_name(const new_Tox *tox, int groupnumber, uint8_t *groupname, TOX_ERR_GROUP_QUERY *error);
+size_t
+new_tox_group_get_peer_name_size (new_Tox const *tox, int groupnumber, uint32_t peernumber)
+{
+  size_t size = tox_group_get_peer_name (tox->tox, groupnumber, peernumber);
+  if (size == 1)
+    {
+      uint8_t name[1];
+      tox_group_get_peer_name (tox->tox, groupnumber, peernumber, name);
+      if (name[0] == '\0')
+        size = 0;
+    }
+  return size;
+}
 
-int
-new_tox_group_set_status(new_Tox *tox, int groupnumber, uint8_t status_type, TOX_ERR_GROUP_SET *error);
+void
+new_tox_group_set_topic(new_Tox *tox, int groupnumber, const uint8_t *topic, uint16_t length, TOX_ERR_GROUP_SET *error) {
+    int success = tox_group_set_topic(tox->tox, groupnumber, topic, length);
+    if (success == -1) {
+      if (error) *error = TOX_ERR_GROUP_SET_FAILED;
+    } else {
+      if (error) *error = TOX_ERR_GROUP_SET_OK;
+    }
+}
+
+void
+new_tox_group_get_topic(const new_Tox *tox, int groupnumber, uint8_t *topic, TOX_ERR_GROUP_QUERY *error) {
+    int success = tox_group_get_topic(tox->tox, groupnumber, topic);
+    if (success == -1) {
+      if (error) *error = TOX_ERR_GROUP_QUERY_FAILED;
+    } else {
+      if (error) *error = TOX_ERR_GROUP_QUERY_OK;
+    }
+}
+
+size_t
+new_tox_group_get_topic_size (new_Tox const *tox, int groupnumber)
+{
+  size_t size = tox_group_get_topic (tox->tox, groupnumber);
+  if (size == 1)
+    {
+      uint8_t topic[1];
+      tox_group_get_topic (tox->tox, groupnumber, topic);
+      if (topic[0] == '\0')
+        size = 0;
+    }
+  return size;
+}
+
+void
+new_tox_group_get_group_name(const new_Tox *tox, int groupnumber, uint8_t *groupname, TOX_ERR_GROUP_QUERY *error) {
+    int success = tox_group_get_topic(tox->tox, groupnumber, groupname);
+    if (success == -1) {
+      if (error) *error = TOX_ERR_GROUP_QUERY_FAILED;
+    } else {
+      if (error) *error = TOX_ERR_GROUP_QUERY_OK;
+    }
+}
+
+size_t
+new_tox_group_get_group_name_size (new_Tox const *tox, int groupnumber)
+{
+  size_t size = tox_group_get_group_name (tox->tox, groupnumber);
+  if (size == 1)
+    {
+      uint8_t name[1];
+      tox_group_get_group_name (tox->tox, groupnumber, name);
+      if (name[0] == '\0')
+        size = 0;
+    }
+  return size;
+}
+
+void
+new_tox_group_set_status(new_Tox *tox, int groupnumber, uint8_t status_type, TOX_ERR_GROUP_SET *error) {
+    int success = tox_group_set_status(tox->tox, groupnumber, status_type);
+    if (success == -1) {
+      if (error) *error = TOX_ERR_GROUP_SET_FAILED;
+    } else {
+      if (error) *error = TOX_ERR_GROUP_SET_OK;
+    }
+}
 
 int
 uint8_t new_tox_group_get_status(const new_Tox *tox, int groupnumber, uint32_t peernumber, TOX_ERR_GROUP_QUERY *error);
 
 int
 uint8_t new_tox_group_get_role(const new_Tox *tox, int groupnumber, uint32_t peernumber, TOX_ERR_GROUP_QUERY *error);
+*/
+
+bool
+new_tox_group_get_chat_id(const new_Tox *tox, int groupnumber, uint8_t *dest, TOX_ERR_GROUP_QUERY *error) {
+  int success = tox_group_get_chat_id(tox->tox, groupnumber, dest);
+  if (success == -1) {
+    if (error) *error = TOX_ERR_GROUP_QUERY_FAILED;
+    return false;
+  } else {
+    if (error) *error = TOX_ERR_GROUP_QUERY_OK;
+    return true;
+  }
+}
 
 int
-new_tox_group_get_invite_key(const new_Tox *tox, int groupnumber, uint8_t *dest, TOX_ERR_GROUP_QUERY *error);
+new_tox_group_get_number_peers(const new_Tox *tox, int groupnumber, TOX_ERR_GROUP_QUERY *error) {
+  int number_peers = tox_group_get_number_peers(tox->tox, groupnumber);
+  if (number_peers == -1) {
+    if (error) *error = TOX_ERR_GROUP_QUERY_FAILED;
+  } else {
+    if (error) *error = TOX_ERR_GROUP_QUERY_OK;
+  }
+  return number_peers;
+}
 
-int
-new_tox_group_get_names(const new_Tox *tox, int groupnumber, uint8_t nicks[][TOX_MAX_NAME_LENGTH], uint16_t lengths[], uint32_t num_peers, TOX_ERR_GROUP_QUERY *error);
-
-int
-new_tox_group_get_number_peers(const new_Tox *tox, int groupnumber, TOX_ERR_GROUP_QUERY *error);
-
+/*
 int
 new_tox_group_toggle_ignore(new_Tox *tox, int groupnumber, uint32_t peernumber, uint8_t ignore, TOX_ERR_GROUP_SET *error);
 */

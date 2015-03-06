@@ -1,7 +1,7 @@
 import com.typesafe.scalalogging.Logger
 import im.tox.tox4j.ToxCoreImpl
 import im.tox.tox4j.core.callbacks.ToxEventListener
-import im.tox.tox4j.core.enums.{ToxConnection, ToxFileControl, ToxFileKind, ToxStatus}
+import im.tox.tox4j.core.enums._
 import im.tox.tox4j.core.{ToxConstants, ToxOptions}
 import org.slf4j.LoggerFactory
 
@@ -141,6 +141,31 @@ object TestClient extends App {
       logger.info(s"[$id] readReceipt($friendNumber, $messageId)")
     }
 
+    override def groupMessage(groupNumber: Int, peerNumber: Int, timeDelta: Int, message: Array[Byte]): Unit = {
+      logger.info(s"[$id] groupMessage($groupNumber, $peerNumber, $timeDelta, ${new String(message)})")
+    }
+
+    override def groupSelfJoin(groupNumber: Int): Unit = ???
+
+    override def groupNickChange(groupNumber: Int, peerNumber: Int, nick: Array[Byte]): Unit = ???
+
+    override def groupPeerlistUpdate(groupNumber: Int): Unit = ???
+
+    override def groupPeerExit(groupNumber: Int, peerNumber: Int, partMessage: Array[Byte]): Unit = ???
+
+    override def groupTopicChange(groupNumber: Int, peerNumber: Int, topic: Array[Byte]): Unit = ???
+
+    override def groupSelfTimeout(groupNumber: Int): Unit = ???
+
+    override def groupPrivateMessage(groupNumber: Int, peerNumber: Int, timeDelta: Int, message: Array[Byte]): Unit = ???
+
+    override def groupInvite(friendNumber: Int, inviteData: Array[Byte]): Unit = ???
+
+    override def groupPeerJoin(groupNumber: Int, peerNumber: Int): Unit = ???
+
+    override def groupAction(groupNumber: Int, peerNumber: Int, timeDelta: Int, message: Array[Byte]): Unit = ???
+
+    override def groupJoinRejected(groupNumber: Int, rejectedReason: ToxGroupJoinRejected): Unit = ???
   }
 
 }

@@ -30,6 +30,6 @@ public interface ToxEventListener extends
         GroupSelfJoinCallback,
         GroupPeerlistUpdateCallback,
         GroupSelfTimeoutCallback,
-        GroupInviteRejectedCallback
+        GroupJoinRejectedCallback
 {
 }

@@ -22,7 +22,7 @@ public class ToxEventAdapter implements ToxEventListener {
     @Override public void readReceipt(int friendNumber, int messageId) { }
     @Override public void groupAction(int groupNumber, int peerNumber, int timeDelta, @NotNull byte[] message) {}
     @Override public void groupInvite(int friendNumber, @NotNull byte[] invite_data) { }
-    @Override public void groupInviteRejected(int groupNumber, ToxGroupJoinRejected rejectedReason) { }
+    @Override public void groupJoinRejected(int groupNumber, ToxGroupJoinRejected rejectedReason) { }
     @Override public void groupMessage(int groupNumber, int peerNumber, int timeDelta, @NotNull byte[] message) { }
     @Override public void groupNickChange(int groupNumber, int peerNumber, @NotNull byte[] newNick) { }
     @Override public void groupPeerExit(int groupNumber, int peerNumber, @NotNull byte[] partMessage) { }

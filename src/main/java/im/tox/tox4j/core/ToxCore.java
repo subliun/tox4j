@@ -391,7 +391,7 @@ public interface ToxCore extends Closeable {
 
     void callbackGroupSelfTimeout(@Nullable GroupSelfTimeoutCallback callback);
 
-    void callbackGroupInviteRejected(@Nullable GroupInviteRejectedCallback callback);
+    void callbackGroupJoinRejected(@Nullable GroupJoinRejectedCallback callback);
 
     void sendLossyPacket(int friendNumber, @NotNull byte[] data) throws ToxSendCustomPacketException;
 

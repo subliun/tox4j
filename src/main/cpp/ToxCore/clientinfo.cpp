@@ -101,12 +101,32 @@ JNIEXPORT void JNICALL Java_im_tox_tox4j_ToxCoreImpl_toxSelfSetName
     }, tox_self_set_name, name_array.data(), name_array.size());
 }
 
-/*
+/* static ErrorHandling handle_group_set_self_name_error(TOX_ERR_GROUP_SET_NAME error) {
+    switch (error) {
+        success_case(SET_NAME);
+        failure_case(SET_NAME, FAILED);
+        failure_case(SET_NAME, TAKEN);
+    }
+    return unhandled();
+}
+
  * Class:     im_tox_tox4jToxCoreImpl
- * Method:    toxSelfGetName
+ * Method:    toxGroupSetSelfName
+ * Signature: (I[B)V
+ *
+JNIEXPORT void JNICALL Java_im_tox_tox4j_ToxCoreImpl_toxGroupSetSelfName
+  (JNIEnv *env, jclass, jint instanceNumber, jint groupNumber, jbyteArray name)
+{
+    ByteArray name_array(env, name);
+    return with_instance(env, instanceNumber, "GroupSetSelfName", handle_group_set_self_name_error, [](bool) {
+    }, tox_group_set_self_name, groupNumber, name_array.data(), name_array.size());
+}
+
+ * Class:     im_tox_tox4jToxCoreImpl
+ * Method:    toxGroupGetSelfName
  * Signature: (I)[B
- */
-JNIEXPORT jbyteArray JNICALL Java_im_tox_tox4j_ToxCoreImpl_toxSelfGetName
+ *
+JNIEXPORT jbyteArray JNICALL Java_im_tox_tox4j_ToxCoreImpl_toxGroupGetSelfName
   (JNIEnv *env, jclass, jint instanceNumber)
 {
     return with_instance(env, instanceNumber, [=](Tox *tox, Events &events) -> jbyteArray {
@@ -120,7 +140,7 @@ JNIEXPORT jbyteArray JNICALL Java_im_tox_tox4j_ToxCoreImpl_toxSelfGetName
 
         return toJavaArray(env, name);
     });
-}
+} */
 
 /*
  * Class:     im_tox_tox4jToxCoreImpl
