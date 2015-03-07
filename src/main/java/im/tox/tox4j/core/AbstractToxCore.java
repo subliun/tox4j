@@ -20,8 +20,6 @@ public abstract class AbstractToxCore implements ToxCore {
         callbackFriendStatus(handler);
         callbackFriendStatusMessage(handler);
         callbackFriendTyping(handler);
-        callbackFriendLosslessPacket(handler);
-        callbackFriendLossyPacket(handler);
         callbackReadReceipt(handler);
     }
 

@@ -49,45 +49,8 @@ public final class Main {
                     } catch (ToxFriendAddException e) {
                         e.printStackTrace();
                     }
-
-                    int groupNumber = tox.joinGroup(hexStringToBytes("80072285F77D9ABE3861850DF2E163A2A923F9C612EF088F90CF2655764C87FC"));
-                    System.out.println("joined group with number " + groupNumber);
                     //int groupNumber2 = tox.joinGroup(hexStringToBytes("744F3C356FEB4D49848CF9D8B8B62E0986BE23531E2A565608220230E44BA432B0D1C0B973C16CD60F7DB6EE93CDF3315F2A30AD4843B7EC24040C89B30F099E"));
                     //System.out.println("joined group2 with number " + groupNumber2);
-                }
-            });
-
-            tox.callbackFriendMessage(new FriendMessageCallback() {
-                @Override
-                public void friendMessage(int friendNumber, int timeDelta, @NotNull byte[] message) {
-
-                }
-            });
-
-            tox.callbackGroupMessage(new GroupMessageCallback() {
-                @Override
-                public void groupMessage(int groupNumber, int peerNumber, int timeDelta, @NotNull byte[] message) {
-                    String strMsg = new String(message);
-                    System.out.println("got a message from group " + new String(tox.getGroupName(groupNumber)) + ", peer " + peerNumber + " that says :\n" + new String(message));
-                    System.out.println("group id is " + bytesToHexString(tox.getGroupChatId(groupNumber)));
-                    if (strMsg.startsWith("msg: ")) {
-                        tox.sendGroupMessage(groupNumber, message);
-                    } else if (strMsg.startsWith("kill: ")) {
-                        tox.deleteGroup(groupNumber, "I'm dying".getBytes());
-                    } else if (strMsg.startsWith("nick:")) {
-                        tox.setGroupSelfName(groupNumber, strMsg.replace("nick: ", "").getBytes());
-                    } else if (strMsg.startsWith("topic:")) {
-                        tox.setGroupTopic(groupNumber, strMsg.replace("topic: ", "").getBytes());
-                    } else if (strMsg.startsWith("^roll")) {
-                        tox.sendGroupMessage(groupNumber, (new String(tox.getGroupPeerName(groupNumber, peerNumber)) + " rolled a " + (new Random().nextInt(6) + 1)).getBytes());
-                    }
-                }
-            });
-
-            tox.callbackGroupAction(new GroupActionCallback() {
-                @Override
-                public void groupAction(int groupNumber, int peerNumber, int timeDelta, @NotNull byte[] message) {
-                    System.out.println("got an action from group " + groupNumber + ", peer " + peerNumber + " that says :\n" + new String(message));
                 }
             });
 
@@ -97,36 +60,6 @@ public final class Main {
                     System.out.println("got an invite from " + friendNumber);
                 }
             });
-
-            tox.callbackGroupNickChange(new GroupNickChangeCallback() {
-                @Override
-                public void groupNickChange(int groupNumber, int peerNumber, @NotNull byte[] nick) {
-                    System.out.println("group number " + groupNumber + " peer " + peerNumber + " nick changed to " + nick);
-                }
-            });
-
-            tox.callbackGroupPeerlistUpdate(new GroupPeerlistUpdateCallback() {
-                @Override
-                public void groupPeerlistUpdate(int groupNumber) {
-                    for (int i = 0; i < tox.getGroupNumberPeers(groupNumber); i++) {
-                        System.out.println("user " + i + " name " + new String(tox.getGroupPeerName(groupNumber, i)));
-                    }
-                }
-            });
-            tox.callbackGroupTopicChange(new GroupTopicChangeCallback() {
-                @Override
-                public void groupTopicChange(int groupNumber, int peerNumber, @NotNull byte[] topic) {
-                    System.out.println("group number " + groupNumber + " peer " + peerNumber + " topic changed to " + topic);
-                }
-            });
-
-            tox.callbackGroupJoinRejected(new GroupJoinRejectedCallback() {
-                @Override
-                public void groupJoinRejected(int groupNumber, ToxGroupJoinRejected rejectedReason) {
-                    System.out.println("group number " + groupNumber + " rejected join with reason " + rejectedReason);
-                }
-            });
-
         } catch (Exception e) {
             e.printStackTrace();
         }

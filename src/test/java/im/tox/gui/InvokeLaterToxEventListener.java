@@ -175,62 +175,8 @@ public class InvokeLaterToxEventListener implements ToxEventListener {
     }
 
     @Override
-    public void groupMessage(int groupNumber, int peerNumber, int timeDelta, @NotNull byte[] message) {
-
-    }
-
-    @Override
-    public void groupAction(int groupNumber, int peerNumber, int timeDelta, @NotNull byte[] message) {
-
-    }
-
-    @Override
     public void groupInvite(int friendNumber, @NotNull byte[] inviteData) {
 
     }
 
-    @Override
-    public void groupJoinRejected(int groupNumber, ToxGroupJoinRejected rejectedReason) {
-
-    }
-
-    @Override
-    public void groupNickChange(int groupNumber, int peerNumber, @NotNull byte[] nick) {
-
-    }
-
-    @Override
-    public void groupPeerExit(int groupNumber, int peerNumber, @NotNull byte[] partMessage) {
-
-    }
-
-    @Override
-    public void groupPeerJoin(int groupNumber, int peerNumber) {
-
-    }
-
-    @Override
-    public void groupPeerlistUpdate(int groupNumber) {
-
-    }
-
-    @Override
-    public void groupPrivateMessage(int groupNumber, int peerNumber, int timeDelta, @NotNull byte[] message) {
-
-    }
-
-    @Override
-    public void groupSelfJoin(int groupNumber) {
-
-    }
-
-    @Override
-    public void groupSelfTimeout(int groupNumber) {
-
-    }
-
-    @Override
-    public void groupTopicChange(int groupNumber, int peerNumber, @NotNull byte[] topic) {
-
-    }
 }

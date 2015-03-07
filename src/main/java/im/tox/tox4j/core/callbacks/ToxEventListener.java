@@ -19,17 +19,6 @@ public interface ToxEventListener extends
         FriendLosslessPacketCallback,
         FriendLossyPacketCallback,
         ReadReceiptCallback,
-        GroupInviteCallback,
-        GroupMessageCallback,
-        GroupPrivateMessageCallback,
-        GroupActionCallback,
-        GroupNickChangeCallback,
-        GroupTopicChangeCallback,
-        GroupPeerJoinCallback,
-        GroupPeerExitCallback,
-        GroupSelfJoinCallback,
-        GroupPeerlistUpdateCallback,
-        GroupSelfTimeoutCallback,
-        GroupJoinRejectedCallback
+        GroupInviteCallback
 {
 }

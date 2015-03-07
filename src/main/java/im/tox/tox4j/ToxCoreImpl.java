@@ -50,19 +50,7 @@ public final class ToxCoreImpl extends AbstractToxCore {
     private FileReceiveCallback fileReceiveCallback;
     private FileReceiveChunkCallback fileReceiveChunkCallback;
     private GroupInviteCallback groupInviteCallback;
-    private GroupMessageCallback groupMessageCallback;
-    private GroupPrivateMessageCallback groupPrivateMessageCallback;
-    private GroupActionCallback groupActionCallback;
-    private GroupNickChangeCallback groupNickChangeCallback;
-    private GroupTopicChangeCallback groupTopicChangeCallback;
-    private GroupPeerJoinCallback groupPeerJoinCallback;
-    private GroupPeerExitCallback groupPeerExitCallback;
-    private GroupSelfJoinCallback groupSelfJoinCallback;
-    private GroupPeerlistUpdateCallback groupPeerlistUpdateCallback;
-    private GroupSelfTimeoutCallback groupSelfTimeoutCallback;
-    private GroupJoinRejectedCallback groupJoinRejectedCallback;
-    private FriendLossyPacketCallback friendLossyPacketCallback;
-    private FriendLosslessPacketCallback friendLosslessPacketCallback;
+
 
     private static native void playground(int instanceNumber);
     void playground() {
@@ -348,71 +336,6 @@ public final class ToxCoreImpl extends AbstractToxCore {
                 System.out.println("GroupInviteCallback with fn " + groupInvite.getFriendNumber() + " and data " + groupInvite.getInviteData().toByteArray());
             }
         }
-        if (groupMessageCallback != null) {
-            for (Core.GroupMessage groupMessage : toxEvents.getGroupMessageList()) {
-                groupMessageCallback.groupMessage(groupMessage.getGroupNumber(), groupMessage.getPeerNumber(), groupMessage.getTimeDelta(), groupMessage.getMessage().toByteArray());
-            }
-        }
-        if (groupPrivateMessageCallback != null) {
-            for (Core.GroupPrivateMessage groupPrivateMessage : toxEvents.getGroupPrivateMessageList()) {
-                groupPrivateMessageCallback.groupPrivateMessage(groupPrivateMessage.getGroupNumber(), groupPrivateMessage.getPeerNumber(), groupPrivateMessage.getTimeDelta(), groupPrivateMessage.getMessage().toByteArray());
-            }
-        }
-        if (groupActionCallback != null) {
-            for (Core.GroupAction groupAction : toxEvents.getGroupActionList()) {
-                groupActionCallback.groupAction(groupAction.getGroupNumber(), groupAction.getPeerNumber(), groupAction.getTimeDelta(), groupAction.getMessage().toByteArray());
-            }
-        }
-        if (groupNickChangeCallback != null) {
-            for (Core.GroupNickChange groupNickChange : toxEvents.getGroupNickChangeList()) {
-                groupNickChangeCallback.groupNickChange(groupNickChange.getGroupNumber(), groupNickChange.getPeerNumber(), groupNickChange.getNewNick().toByteArray());
-            }
-        }
-        if (groupTopicChangeCallback != null) {
-            for (Core.GroupTopicChange groupTopicChange : toxEvents.getGroupTopicChangeList()) {
-                groupTopicChangeCallback.groupTopicChange(groupTopicChange.getGroupNumber(), groupTopicChange.getPeerNumber(), groupTopicChange.getTopic().toByteArray());
-            }
-        }
-        if (groupPeerJoinCallback != null) {
-            for (Core.GroupPeerJoin groupPeerJoin : toxEvents.getGroupPeerJoinList()) {
-                groupPeerJoinCallback.groupPeerJoin(groupPeerJoin.getGroupNumber(), groupPeerJoin.getPeerNumber());
-            }
-        }
-        if (groupPeerExitCallback != null) {
-            for (Core.GroupPeerExit groupPeerExit : toxEvents.getGroupPeerExitList()) {
-                groupPeerExitCallback.groupPeerExit(groupPeerExit.getGroupNumber(), groupPeerExit.getPeerNumber(), groupPeerExit.getPartMessage().toByteArray());
-            }
-        }
-        if (groupSelfJoinCallback != null) {
-            for (Core.GroupSelfJoin groupSelfJoin : toxEvents.getGroupSelfJoinList()) {
-                groupSelfJoinCallback.groupSelfJoin(groupSelfJoin.getGroupNumber());
-            }
-        }
-        if (groupPeerlistUpdateCallback != null) {
-            for (Core.GroupPeerlistUpdate groupPeerlistUpdate : toxEvents.getGroupPeerlistUpdateList()) {
-                groupPeerlistUpdateCallback.groupPeerlistUpdate(groupPeerlistUpdate.getGroupNumber());
-            }
-        }
-        if (groupSelfTimeoutCallback != null) {
-            for (Core.GroupSelfTimeout groupSelfTimeout : toxEvents.getGroupSelfTimeoutList()) {
-                groupSelfTimeoutCallback.groupSelfTimeout(groupSelfTimeout.getGroupNumber());
-            }
-        }
-        if (groupJoinRejectedCallback != null) {
-            for (Core.GroupRejected groupRejected : toxEvents.getGroupRejectedList()) {
-                groupJoinRejectedCallback.groupJoinRejected(groupRejected.getGroupNumber(), convert(groupRejected.getType()));
-            }
-        }
-        if (friendLossyPacketCallback != null) {
-			for (Core.FriendLossyPacket friendLossyPacket : toxEvents.getFriendLossyPacketList()) {
-				friendLossyPacketCallback.friendLossyPacket(friendLossyPacket.getFriendNumber(), friendLossyPacket.getData().toByteArray());
-			}
-		}
-        if (friendLosslessPacketCallback != null) {
-			for (Core.FriendLosslessPacket friendLosslessPacket : toxEvents.getFriendLosslessPacketList()) {
-				friendLosslessPacketCallback.friendLosslessPacket(friendLosslessPacket.getFriendNumber(), friendLosslessPacket.getData().toByteArray());
-			}
-		}
     }
 
 
@@ -699,151 +622,14 @@ public final class ToxCoreImpl extends AbstractToxCore {
     private static native int toxGroupNewJoin(int instanceNumber, @NotNull byte[] inviteKey);
 
     @Override
-    public int joinGroup(byte[] inviteKey) {
-        return toxGroupNewJoin(instanceNumber, inviteKey);
-    }
-
-    private static native void toxGroupDelete(int instanceNumber, int groupNumber, @NotNull byte[] partMessage);
-
-    @Override
-    public void deleteGroup(int groupNumber, @NotNull byte[] partMessage) { toxGroupDelete(instanceNumber, groupNumber, partMessage); }
-
-    private static native void toxGroupMessageSend(int instanceNumber, int groupNumber, @NotNull byte[] message);
-
-    @Override
-    public void sendGroupMessage(int groupNumber, @NotNull byte[] message) { toxGroupMessageSend(instanceNumber, groupNumber, message); }
-
-    private static native void toxGroupPrivateMessageSend(int instanceNumber, int groupNumber, int peerNumber, @NotNull byte[] message);
-
-    @Override
-    public void sendGroupPrivateMessage(int groupNumber, int peerNumber, @NotNull byte[] message) { toxGroupPrivateMessageSend(instanceNumber, groupNumber, peerNumber, message); }
-
-    private static native void toxGroupActionSend(int instanceNumber, int groupNumber, @NotNull byte[] message);
-
-    @Override
-    public void sendGroupAction(int groupNumber, @NotNull byte[] message) { toxGroupActionSend(instanceNumber, groupNumber, message); }
-
-    private static native void toxGroupSetSelfName(int instanceNumber, int groupNumber, @NotNull byte[] name);
-
-    @Override
-    public void setGroupSelfName(int groupNumber, @NotNull byte[] name) { toxGroupSetSelfName(instanceNumber, groupNumber, name); }
-
-    private static native byte[] toxGroupGetPeerName(int instanceNumber, int groupNumber, int peerNumber);
-
-    @NotNull
-    @Override
-    public byte[] getGroupPeerName(int groupNumber, int peerNumber) { return toxGroupGetPeerName(instanceNumber, groupNumber, peerNumber); }
-
-    private static native byte[] toxGroupGetSelfName(int instanceNumber, int groupNumber);
-
-    @NotNull
-    @Override
-    public byte[] getGroupSelfName(int groupNumber) { return toxGroupGetSelfName(instanceNumber, groupNumber); }
-
-    private static native void toxGroupSetTopic(int instanceNumber, int groupNumber, byte[] topic);
-
-    @Override
-    public void setGroupTopic(int groupNumber, byte[] topic) { toxGroupSetTopic(instanceNumber, groupNumber, topic); }
-
-    private static native byte[] toxGroupGetTopic(int instanceNumber, int groupNumber);
-
-    @NotNull
-    @Override
-    public byte[] getGroupTopic(int groupNumber) { return toxGroupGetTopic(instanceNumber, groupNumber); }
-
-    private static native byte[] toxGroupGetGroupName(int instanceNumber, int groupNumber);
-
-    @NotNull
-    @Override
-    public byte[] getGroupName(int groupNumber) { return toxGroupGetGroupName(instanceNumber, groupNumber); }
-
-    private static native void toxGroupSetStatus(int instanceNumber, int groupNumber, int status);
-
-    @Override
-    public void setGroupSelfStatus(int groupNumber, ToxGroupStatus status) {
-        toxGroupSetStatus(instanceNumber, groupNumber, status.ordinal());
-    }
-
-    private static native int toxGroupGetStatus(int instanceNumber, int groupNumber, int peerNumber);
-
-    @Override
-    public ToxGroupStatus getGroupPeerStatus(int groupNumber, int peerNumber) {
-        return ToxGroupStatus.values()[toxGroupGetStatus(instanceNumber, groupNumber, peerNumber)];
-    }
-
-    private static native int toxGroupGetRole(int instanceNumber,int groupNumber, int peerNumber);
-
-    @Override
-    public ToxGroupRole getGroupPeerRole(int groupNumber, int peerNumber) {
-        return ToxGroupRole.values()[toxGroupGetRole(instanceNumber, groupNumber, peerNumber)];
-    }
-
-    private static native byte[] toxGroupGetChatId(int instanceNumber, int groupNumber);
-
-    @Override
-    public byte[] getGroupChatId(int groupNumber) { return toxGroupGetChatId(instanceNumber, groupNumber); }
-
-    private static native int toxGroupGetNumberPeers(int instanceNumber, int groupNumber);
-
-    @Override
-    public int getGroupNumberPeers(int groupNumber) { return toxGroupGetNumberPeers(instanceNumber, groupNumber); }
-
-    private static native int toxGroupCountGroups(int instanceNumber);
-
-    @Override
-    public int getActiveGroupsCount() { return toxGroupCountGroups(instanceNumber); }
-
-
-    @Override
     public void callbackGroupInvite(@Nullable GroupInviteCallback callback) { this.groupInviteCallback = callback; }
 
-    @Override
-    public void callbackGroupMessage(GroupMessageCallback callback) {
-        this.groupMessageCallback = callback;
-    }
-
-    @Override
-    public void callbackGroupPrivateMessage(@Nullable GroupPrivateMessageCallback callback) { this.groupPrivateMessageCallback = callback; }
-
-    @Override
-    public void callbackGroupAction(@Nullable GroupActionCallback callback) { this.groupActionCallback = callback; }
-
-    @Override
-    public void callbackGroupNickChange(@Nullable GroupNickChangeCallback callback) { this.groupNickChangeCallback = callback; }
-
-    @Override
-    public void callbackGroupTopicChange(@Nullable GroupTopicChangeCallback callback) { this.groupTopicChangeCallback = callback; }
-
-    @Override
-    public void callbackPeerJoin(@Nullable GroupPeerJoinCallback callback) { this.groupPeerJoinCallback = callback; }
-
-    @Override
-    public void callbackPeerExit(@Nullable GroupPeerExitCallback callback) { this.groupPeerExitCallback = callback; }
-
-    @Override
-    public void callbackGroupSelfJoin(@Nullable GroupSelfJoinCallback callback) { this.groupSelfJoinCallback = callback; }
-
-    @Override
-    public void callbackGroupPeerlistUpdate(@Nullable GroupPeerlistUpdateCallback callback) { this.groupPeerlistUpdateCallback = callback; }
-
-    @Override
-    public void callbackGroupSelfTimeout(@Nullable GroupSelfTimeoutCallback callback) { this.groupSelfTimeoutCallback = callback; }
-
-    @Override
-    public void callbackGroupJoinRejected(@Nullable GroupJoinRejectedCallback callback) { this.groupJoinRejectedCallback = callback; }
-
-    private static native void toxSendLossyPacket(int instanceNumber, int friendNumber, @NotNull byte[] data) throws ToxSendCustomPacketException;
+    private static native void toxSendLossyPacket(int instanceNumber, int friendNumber, @NotNull byte[] data);
 
     @Override
     public void sendLossyPacket(int friendNumber, @NotNull byte[] data) throws ToxSendCustomPacketException {
-        toxSendLossyPacket(instanceNumber, friendNumber, data);
+        toxSendLosslessPacket(instanceNumber, friendNumber, data);
     }
-
-    @Override
-    public void callbackFriendLossyPacket(FriendLossyPacketCallback callback) {
-        this.friendLossyPacketCallback = callback;
-    }
-
 
     private static native void toxSendLosslessPacket(int instanceNumber, int friendNumber, @NotNull byte[] data) throws ToxSendCustomPacketException;
 
@@ -852,9 +638,5 @@ public final class ToxCoreImpl extends AbstractToxCore {
         toxSendLosslessPacket(instanceNumber, friendNumber, data);
     }
 
-    @Override
-    public void callbackFriendLosslessPacket(FriendLosslessPacketCallback callback) {
-        this.friendLosslessPacketCallback = callback;
-    }
 
 }
