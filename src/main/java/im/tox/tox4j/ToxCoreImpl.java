@@ -230,19 +230,10 @@ public final class ToxCoreImpl extends AbstractToxCore {
 
     private static @NotNull ToxFileKind convert(@NotNull Core.FileReceive.Kind kind) {
         switch (kind) {
-            case AVATAR: return ToxFileKind.AVATAR;
-            case DATA: return ToxFileKind.DATA;
-        }
-        throw new IllegalStateException("Bad enumerator: " + kind);
-    }
-
-    private static @NotNull ToxGroupJoinRejected convert(@NotNull Core.GroupRejected.Kind kind) {
-        switch (kind) {
-            case NICK_TAKEN: return ToxGroupJoinRejected.NICK_TAKEN;
-            case GROUP_FULL: return ToxGroupJoinRejected.GROUP_FULL;
-            case INVITES_DISABLED: return ToxGroupJoinRejected.INVITES_DISABLED;
-            case INVITE_FAILED: return ToxGroupJoinRejected.INVITE_FAILED;
-
+            case AVATAR:
+                return ToxFileKind.AVATAR;
+            case DATA:
+                return ToxFileKind.DATA;
         }
         throw new IllegalStateException("Bad enumerator: " + kind);
     }

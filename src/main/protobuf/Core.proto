@@ -123,73 +123,6 @@ message GroupInvite {
     required bytes  inviteData       = 2;
 }
 
-message GroupMessage {
-    required uint32 groupNumber     = 1;
-    required uint32 peerNumber      = 2;
-    required uint32 timeDelta       = 3;
-    required bytes  message         = 4;
-}
-
-message GroupPrivateMessage {
-    required uint32 groupNumber     = 1;
-    required uint32 peerNumber      = 2;
-    required uint32 timeDelta       = 3;
-    required bytes  message         = 4;
-}
-
-message GroupAction {
-    required uint32 groupNumber     = 1;
-    required uint32 peerNumber      = 2;
-    required uint32 timeDelta       = 3;
-    required bytes  message         = 4;
-}
-
-message GroupNickChange {
-    required uint32 groupNumber     = 1;
-    required uint32 peerNumber      = 2;
-    required bytes  newNick         = 3;
-}
-
-message GroupTopicChange {
-    required uint32 groupNumber     = 1;
-    required uint32 peerNumber      = 2;
-    required bytes  topic           = 3;
-}
-
-message GroupPeerJoin {
-    required uint32 groupNumber     = 1;
-    required uint32 peerNumber      = 2;
-}
-
-message GroupPeerExit {
-    required uint32 groupNumber     = 1;
-    required uint32 peerNumber      = 2;
-    required bytes partMessage      = 3;
-}
-
-message GroupSelfJoin {
-    required uint32 groupNumber     = 1;
-}
-
-message GroupPeerlistUpdate {
-    required uint32 groupNumber     = 1;
-}
-
-message GroupSelfTimeout {
-    required uint32 groupNumber     = 1;
-}
-
-message GroupRejected {
-    enum Kind {
-        NICK_TAKEN          = 1;
-        GROUP_FULL          = 2;
-        INVITES_DISABLED    = 3;
-        INVITE_FAILED       = 4;
-    }
-    required uint32 groupNumber     = 1;
-    required Kind   type            = 2;
-}
-
 message CoreEvents {
     repeated ConnectionStatus       connectionStatus       =  1;
     repeated FileControl            fileControl            =  2;
@@ -208,15 +141,4 @@ message CoreEvents {
     repeated FriendLossyPacket      friendLossyPacket      = 15;
     repeated ReadReceipt            readReceipt            = 16;
     repeated GroupInvite            groupInvite            = 17;
-    repeated GroupMessage           groupMessage           = 18;
-    repeated GroupPrivateMessage    groupPrivateMessage    = 19;
-    repeated GroupAction            groupAction            = 20;
-    repeated GroupNickChange        groupNickChange        = 21;
-    repeated GroupTopicChange       groupTopicChange       = 22;
-    repeated GroupPeerJoin          groupPeerJoin          = 23;
-    repeated GroupPeerExit          groupPeerExit          = 24;
-    repeated GroupSelfJoin          groupSelfJoin          = 25;
-    repeated GroupPeerlistUpdate    groupPeerlistUpdate    = 26;
-    repeated GroupSelfTimeout       groupSelfTimeout       = 27;
-    repeated GroupRejected          groupRejected          = 28;
 }

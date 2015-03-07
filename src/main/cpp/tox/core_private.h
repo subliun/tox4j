@@ -144,17 +144,6 @@ struct new_Tox
     callback<tox_file_receive_cb> file_receive;
     callback<tox_file_receive_chunk_cb> file_receive_chunk;
     callback<tox_group_invite_cb> group_invite;
-    callback<tox_group_message_cb> group_message;
-    callback<tox_group_private_message_cb> group_private_message;
-    callback<tox_group_action_cb> group_action;
-    callback<tox_group_nick_change_cb> group_nick_change;
-    callback<tox_group_topic_change_cb> group_topic_change;
-    callback<tox_group_peer_join_cb> group_peer_join;
-    callback<tox_group_peer_exit_cb> group_peer_exit;
-    callback<tox_group_self_join_cb> group_self_join;
-    callback<tox_group_peerlist_update_cb> group_peerlist_update;
-    callback<tox_group_self_timeout_cb> group_self_timeout;
-    callback<tox_group_rejected_cb> group_rejected;
     callback<tox_friend_lossy_packet_cb> friend_lossy_packet;
     callback<tox_friend_lossless_packet_cb> friend_lossless_packet;
   } callbacks;
