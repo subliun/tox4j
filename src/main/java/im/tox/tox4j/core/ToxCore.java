@@ -422,6 +422,10 @@ public interface ToxCore extends Closeable {
      */
     int getGroupNumberPeers(int groupNumber);
 
+
+    /** @return the number of active groups. */
+    int getActiveGroupsCount();
+
     void callbackGroupInvite(@Nullable GroupInviteCallback callback);
 
     void callbackGroupMessage(@Nullable GroupMessageCallback callback);

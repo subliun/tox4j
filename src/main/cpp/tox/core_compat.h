@@ -109,6 +109,7 @@
 #define tox_group_get_chat_id new_tox_group_get_chat_id
 #define tox_group_get_names new_tox_group_get_names
 #define tox_group_get_number_peers new_tox_group_get_number_peers
+#define tox_group_count_groups new_tox_group_count_groups
 #define tox_group_toggle_ignore new_tox_group_toggle_ignore
 
 #define tox_callback_group_invite new_tox_callback_group_invite

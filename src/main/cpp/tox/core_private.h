@@ -361,6 +361,7 @@ struct new_Tox
     {
       auto self = static_cast<new_Tox *> (userdata);
       auto cb = self->callbacks.group_invite;
+      printf("core_private.h %s(%p, %d, %p, %p)\n", __func__, m, length, invite_data, userdata);
       cb.func (self, friendnumber, invite_data, length, userdata);
     }
 

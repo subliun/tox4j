@@ -196,6 +196,8 @@ static void tox4j_file_receive_chunk_cb(Tox *tox, uint32_t friend_number, uint32
 
 static void tox4j_group_invite_cb(Tox *tox, uint32_t friendnumber, const uint8_t *invite_data, uint16_t length, void *userdata)
 {
+    printf("lifecycle.cpp %s(%p, %d, %p, %p)\n", __func__, tox, length, invite_data, userdata);
+
     unused(tox);
     Events &events = *static_cast<Events *>(userdata);
     auto msg = events.add_groupinvite();

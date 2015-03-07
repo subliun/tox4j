@@ -345,6 +345,7 @@ public final class ToxCoreImpl extends AbstractToxCore {
         if (groupInviteCallback != null) {
             for (Core.GroupInvite groupInvite : toxEvents.getGroupInviteList()) {
                 groupInviteCallback.groupInvite(groupInvite.getFriendNumber(), groupInvite.getInviteData().toByteArray());
+                System.out.println("GroupInviteCallback with fn " + groupInvite.getFriendNumber() + " and data " + groupInvite.getInviteData().toByteArray());
             }
         }
         if (groupMessageCallback != null) {
@@ -786,6 +787,11 @@ public final class ToxCoreImpl extends AbstractToxCore {
 
     @Override
     public int getGroupNumberPeers(int groupNumber) { return toxGroupGetNumberPeers(instanceNumber, groupNumber); }
+
+    private static native int toxGroupCountGroups(int instanceNumber);
+
+    @Override
+    public int getActiveGroupsCount() { return toxGroupCountGroups(instanceNumber); }
 
 
     @Override

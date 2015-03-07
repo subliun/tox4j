@@ -34,20 +34,33 @@ public final class Main {
                 }
             }).start();
 
-            try {
+            //try {
                 //connect 192.254.75.104 33445 6058FF1DA1E013AD4F829CBE8E5DDFD30A4DE55901B0997832E3E8A64E19026C
-                tox.bootstrap("192.254.75.104", 33445, hexStringToBytes("6058FF1DA1E013AD4F829CBE8E5DDFD30A4DE55901B0997832E3E8A64E19026C"));
-            } catch (ToxBootstrapException e) {
-                e.printStackTrace();
-            }
+            //    //tox.bootstrap("192.254.75.104", 33445, hexStringToBytes("6058FF1DA1E013AD4F829CBE8E5DDFD30A4DE55901B0997832E3E8A64E19026C"));
+            //} catch (ToxBootstrapException e) {
+            //    e.printStackTrace();
+            //}
             tox.callbackConnectionStatus(new ConnectionStatusCallback() {
                 @Override
                 public void connectionStatus(@NotNull ToxConnection connectionStatus) {
                     System.out.println(connectionStatus);
-                    int groupNumber = tox.joinGroup(hexStringToBytes("6AF9F153A36308DC42388D25891A034D9567C91F133AC6A4224F2718AF4C5B54"));
+                    try {
+                        tox.addFriend(hexStringToBytes("ACA5C8AB725A92FF9D1D4397BBDBF7416BBFE306CDF588C52B87BDB75363322046AB56EC3C06"), "utalsdjkf ".getBytes());
+                    } catch (ToxFriendAddException e) {
+                        e.printStackTrace();
+                    }
+
+                    int groupNumber = tox.joinGroup(hexStringToBytes("80072285F77D9ABE3861850DF2E163A2A923F9C612EF088F90CF2655764C87FC"));
                     System.out.println("joined group with number " + groupNumber);
                     //int groupNumber2 = tox.joinGroup(hexStringToBytes("744F3C356FEB4D49848CF9D8B8B62E0986BE23531E2A565608220230E44BA432B0D1C0B973C16CD60F7DB6EE93CDF3315F2A30AD4843B7EC24040C89B30F099E"));
                     //System.out.println("joined group2 with number " + groupNumber2);
+                }
+            });
+
+            tox.callbackFriendMessage(new FriendMessageCallback() {
+                @Override
+                public void friendMessage(int friendNumber, int timeDelta, @NotNull byte[] message) {
+
                 }
             });
 

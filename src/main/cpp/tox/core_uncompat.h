@@ -110,6 +110,7 @@
 #undef tox_group_get_chat_id
 #undef tox_group_get_names
 #undef tox_group_get_number_peers
+#undef tox_group_count_groups
 #undef tox_group_toggle_ignore
 
 #undef tox_callback_group_invite

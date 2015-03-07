@@ -1263,6 +1263,11 @@ new_tox_group_get_number_peers(const new_Tox *tox, int groupnumber, TOX_ERR_GROU
   return number_peers;
 }
 
+uint32_t
+new_tox_group_count_groups(const new_Tox *tox) {
+  return tox_group_count_groups(tox->tox);
+}
+
 /*
 int
 new_tox_group_toggle_ignore(new_Tox *tox, int groupnumber, uint32_t peernumber, uint8_t ignore, TOX_ERR_GROUP_SET *error);

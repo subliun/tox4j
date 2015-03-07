@@ -1917,6 +1917,9 @@ uint32_t num_peers, TOX_ERR_GROUP_QUERY *error);
 */
 int tox_group_get_number_peers(const Tox *tox, int groupnumber, TOX_ERR_GROUP_QUERY *error);
 
+/* Returns the number of active groups. */
+uint32_t tox_group_count_groups(const Tox *tox);
+
 /* Toggle ignore on peernumber in groupnumber.
 * If ignore is 1, group and private messages from peernumber are ignored, as well as A/V.
 * If ignore is 0, peer is unignored.

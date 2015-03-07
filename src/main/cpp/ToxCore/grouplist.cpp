@@ -189,3 +189,17 @@ JNIEXPORT jint JNICALL Java_im_tox_tox4j_ToxCoreImpl_toxGroupGetNumberPeers
         return number_peers;
     }, tox_group_get_number_peers, groupNumber);
 }
+
+/*
+ * Class:     im_tox_tox4jToxCoreImpl
+ * Method:    toxGroupCountGroups
+ * Signature: (II)I
+ */
+JNIEXPORT jint JNICALL Java_im_tox_tox4j_ToxCoreImpl_toxGroupCountGroups
+  (JNIEnv *env, jclass, jint instanceNumber)
+{
+    return with_instance(env, instanceNumber, [=](Tox *tox, Events &events) {
+        unused(events);
+        return tox_group_count_groups(tox);
+    });
+}
