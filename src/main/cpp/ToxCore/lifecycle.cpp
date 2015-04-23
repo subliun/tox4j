@@ -189,6 +189,117 @@ tox4j_file_recv_chunk_cb (Tox *tox, uint32_t friend_number, uint32_t file_number
 }
 
 static void
+tox4j_group_invite_cb(Tox *tox, int32_t friendnumber, const uint8_t *invite_data, uint16_t length, Events &events)
+{
+    unused(tox);
+    auto msg = events.add_groupinvite();
+    msg->set_friendnumber(friendnumber);
+    msg->set_invitedata(invite_data, length);
+}
+
+
+static void tox4j_group_message_cb(Tox *tox, int groupnumber, uint32_t peernumber, const uint8_t *message, uint16_t length, Events &events)
+{
+    unused(tox);
+    auto msg = events.add_groupmessage();
+    msg->set_groupnumber(groupnumber);
+    msg->set_peernumber(peernumber);
+    msg->set_timedelta(0);
+    msg->set_message(message, length);
+}
+
+static void tox4j_group_private_message_cb(Tox *tox, int groupnumber, uint32_t peernumber, const uint8_t *message, uint16_t length, Events &events)
+{
+    unused(tox);
+    auto msg = events.add_groupprivatemessage();
+    msg->set_groupnumber(groupnumber);
+    msg->set_peernumber(peernumber);
+    msg->set_timedelta(0);
+    msg->set_message(message, length);
+}
+
+static void tox4j_group_action_cb(Tox *tox, int groupnumber, uint32_t peernumber, const uint8_t *message, uint16_t length, Events &events)
+{
+    unused(tox);
+    auto msg = events.add_groupaction();
+    msg->set_groupnumber(groupnumber);
+    msg->set_peernumber(peernumber);
+    msg->set_timedelta(0);
+    msg->set_message(message, length);
+}
+
+static void tox4j_group_nick_change_cb(Tox *tox, int groupnumber, uint32_t peernumber, const uint8_t *newnick, uint16_t length, Events &events)
+{
+    unused(tox);
+    auto msg = events.add_groupnickchange();
+    msg->set_groupnumber(groupnumber);
+    msg->set_peernumber(peernumber);
+    msg->set_newnick(newnick, length);
+}
+
+static void tox4j_group_topic_change_cb(Tox *tox, int groupnumber, uint32_t peernumber, const uint8_t *topic, uint16_t length, Events &events)
+{
+    unused(tox);
+    auto msg = events.add_grouptopicchange();
+    msg->set_groupnumber(groupnumber);
+    msg->set_peernumber(peernumber);
+    msg->set_topic(topic, length);
+}
+
+static void tox4j_group_peer_join_cb(Tox *tox, int groupnumber, uint32_t peernumber, Events &events)
+{
+    unused(tox);
+    auto msg = events.add_grouppeerjoin();
+    msg->set_groupnumber(groupnumber);
+    msg->set_peernumber(peernumber);
+}
+
+static void tox4j_group_peer_exit_cb(Tox *tox, int groupnumber, uint32_t peernumber, const uint8_t *partmessage, uint16_t length, Events &events)
+{
+    unused(tox);
+    auto msg = events.add_grouppeerexit();
+    msg->set_groupnumber(groupnumber);
+    msg->set_peernumber(peernumber);
+    msg->set_partmessage(partmessage, length);
+}
+
+static void tox4j_group_self_join_cb(Tox *tox, int groupnumber, Events &events)
+{
+    unused(tox);
+    auto msg = events.add_groupselfjoin();
+    msg->set_groupnumber(groupnumber);
+}
+
+static void tox4j_group_peerlist_update_cb(Tox *tox, int groupnumber, Events &events)
+{
+    unused(tox);
+    auto msg = events.add_grouppeerlistupdate();
+    msg->set_groupnumber(groupnumber);
+}
+
+static void tox4j_group_rejected_cb(Tox *tox, int groupnumber, uint8_t type, Events &events)
+{
+    unused(tox);
+    auto msg = events.add_grouprejected();
+    msg->set_groupnumber(groupnumber);
+    using proto::GroupRejected;
+        switch (type) {
+            case TOX_GJ_NICK_TAKEN:
+                msg->set_type(GroupRejected::NICK_TAKEN);
+                break;
+            case TOX_GJ_GROUP_FULL:
+                msg->set_type(GroupRejected::GROUP_FULL);
+                break;
+            case TOX_GJ_INVITES_DISABLED:
+                msg->set_type(GroupRejected::INVITES_DISABLED);
+                break;
+            case TOX_GJ_INVITE_FAILED:
+                msg->set_type(GroupRejected::INVITE_FAILED);
+                break;
+        }
+}
+
+static void
 tox4j_friend_lossy_packet_cb (Tox *tox, uint32_t friend_number, uint8_t const *data, size_t length, Events &events)
 {
   unused (tox);
@@ -310,6 +421,19 @@ TOX_METHOD (jint, New,
           .set<tox::callback_file_recv_control,         tox4j_file_recv_control_cb       > ()
           .set<tox::callback_file_recv_chunk,           tox4j_file_recv_chunk_cb         > ()
           .set<tox::callback_file_chunk_request,        tox4j_file_chunk_request_cb      > ()
+          .set<tox::callback_group_invite,              tox4j_group_invite_cb            > ()
+          .set<tox::callback_group_message,             tox4j_group_message_cb           > ()
+          .set<tox::callback_group_private_message,     tox4j_group_private_message_cb   > ()
+          .set<tox::callback_group_action,              tox4j_group_action_cb            > ()
+          .set<tox::callback_group_nick_change,         tox4j_group_nick_change_cb       > ()
+          .set<tox::callback_group_topic_change,        tox4j_group_topic_change_cb      > ()
+          .set<tox::callback_group_peer_join,           tox4j_group_peer_join_cb         > ()
+          .set<tox::callback_group_peer_exit,           tox4j_group_peer_exit_cb         > ()
+          .set<tox::callback_group_self_join,           tox4j_group_self_join_cb         > ()
+          .set<tox::callback_group_peer_exit,           tox4j_group_peer_exit_cb         > ()
+          .set<tox::callback_group_self_join,           tox4j_group_self_join_cb         > ()
+          .set<tox::callback_group_peerlist_update,     tox4j_group_peerlist_update_cb   > ()
+          .set<tox::callback_group_rejected,            tox4j_group_rejected_cb          > ()
           .set<tox::callback_friend_lossy_packet,       tox4j_friend_lossy_packet_cb     > ()
           .set<tox::callback_friend_lossless_packet,    tox4j_friend_lossless_packet_cb  > ()
           .set (tox.get ());

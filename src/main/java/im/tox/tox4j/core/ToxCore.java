@@ -3,9 +3,7 @@ package im.tox.tox4j.core;
 import im.tox.tox4j.annotations.NotNull;
 import im.tox.tox4j.annotations.Nullable;
 import im.tox.tox4j.core.callbacks.*;
-import im.tox.tox4j.core.enums.ToxFileControl;
-import im.tox.tox4j.core.enums.ToxMessageType;
-import im.tox.tox4j.core.enums.ToxStatus;
+import im.tox.tox4j.core.enums.*;
 import im.tox.tox4j.core.exceptions.*;
 
 import java.io.Closeable;
@@ -343,6 +341,133 @@ public interface ToxCore extends Closeable {
     void callbackFileReceive(@Nullable FileReceiveCallback callback);
 
     void callbackFileReceiveChunk(@Nullable FileReceiveChunkCallback callback);
+
+    /**
+     * Accept a group invite using the data retrieved from <code>callbackGroupInvite</code>
+     *
+     * @param inviteData the data used for the invite
+     * @return the group's groupNumber
+     */
+    public int acceptGroupInvite(@NotNull byte[] inviteData) throws ToxGroupAcceptInviteException;
+
+    /**
+     * Create a new groupchat with name 'name'.
+     *
+     * @param name the name of the group
+     * @return the newly-created group's groupNumber
+     */
+    int newGroup(byte[] name);
+
+    /** Joins a groupchat using the supplied group key.
+     *
+     * @return groupNumber
+     */
+    int joinGroup(byte[] inviteKey);
+
+    /** Reconnects to a groupnumber's group and maintains your own state.
+     *
+     * @return groupNumber
+     */
+    int reconnectGroup(int groupNumber);
+
+    /**
+     * Deletes groupNumber's group chat and sends an optional parting message to group peers
+     * The maximum parting message length is TOX_MAX_GROUP_PART_LENGTH.
+     */
+    void deleteGroup(int groupNumber, @NotNull byte[] partMessage);
+
+    /** Sends a groupchat message to group groupnumber. Messages should be split at TOX_MAX_MESSAGE_LENGTH bytes.
+     */
+    void sendGroupMessage(int groupNumber, @NotNull byte[] message);
+
+    /** Sends a private message to peernumber in group groupnumber. Messages should be split at TOX_MAX_MESSAGE_LENGTH bytes.
+     */
+    void sendGroupPrivateMessage(int groupNumber, int peerNumber, @NotNull byte[] message);
+
+    /** Sends a groupchat action message to groupnumber. Messages should be split at TOX_MAX_MESSAGE_LENGTH bytes.
+     */
+    void sendGroupAction(int groupNumber, @NotNull byte[] message);
+
+    /** Sets your name for groupnumber. length should be no larger than TOX_MAX_NAME_LENGTH bytes.
+     */
+    void setGroupSelfName(int groupNumber, byte[] name);
+
+    /**
+     * Get peernumber's name in groupnumber's group chat.
+     */
+    byte[] getGroupPeerName(int groupNumber, int peerNumber);
+
+    /**
+     * Get your own name for groupnumber's group.
+     */
+    byte[] getGroupSelfName(int groupNumber);
+
+    /**
+     * Sets groupnumber's topic.
+     */
+    void setGroupTopic(int groupNumber, byte[] topic);
+
+    /** Gets groupnumber's topic.
+     */
+    byte[] getGroupTopic(int groupNumber);
+
+    /** Gets groupnumber's group name.
+     */
+    byte[] getGroupName(int groupNumber);
+
+    /** Sets your status for groupnumber.
+     */
+    void setGroupSelfStatus(int groupNumber, ToxGroupStatus status);
+
+    /** Get peernumber's status in groupnumber's group chat.
+     *
+     * @return a TOX_GROUP_STATUS on success.
+     * @return TOX_GS_INVALID on failure.
+     */
+    ToxGroupStatus getGroupPeerStatus(int groupNumber, int peernumber);
+
+    /* Get peernumber's group role in groupnumber's group chat.
+      *
+      * @return a TOX_GROUP_ROLE on success.
+      * @return TOX_GR_INVALID on failure.
+      */
+    ToxGroupRole getGroupPeerRole(int groupNumber, int peernumber);
+
+    /**
+     * Get the chat id of the groupchat from the groupnumber.
+     */
+    byte[] getGroupChatId(int groupNumber);
+
+    /**
+     * @return the number of peers in groupnumber.
+     */
+    int getGroupNumberPeers(int groupNumber);
+
+
+    /** @return the number of active groups. */
+    int getActiveGroupsCount();
+
+    void callbackGroupInvite(@Nullable GroupInviteCallback callback);
+
+    void callbackGroupMessage(@Nullable GroupMessageCallback callback);
+
+    void callbackGroupPrivateMessage(@Nullable GroupPrivateMessageCallback callback);
+
+    void callbackGroupAction(@Nullable GroupActionCallback callback);
+
+    void callbackGroupNickChange(@Nullable GroupNickChangeCallback callback);
+
+    void callbackGroupTopicChange(@Nullable GroupTopicChangeCallback callback);
+
+    void callbackPeerJoin(@Nullable GroupPeerJoinCallback callback);
+
+    void callbackPeerExit(@Nullable GroupPeerExitCallback callback);
+
+    void callbackGroupSelfJoin(@Nullable GroupSelfJoinCallback callback);
+
+    void callbackGroupPeerlistUpdate(@Nullable GroupPeerlistUpdateCallback callback);
+
+    void callbackGroupJoinRejected(@Nullable GroupJoinRejectedCallback callback);
 
     void sendLossyPacket(int friendNumber, @NotNull byte[] data) throws ToxSendCustomPacketException;
 

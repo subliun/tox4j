@@ -116,6 +116,85 @@ TOX_METHOD (void, SelfSetName,
     tox_self_set_name, name_array.data (), name_array.size ());
 }
 
+bool
+new_tox_group_set_self_name(Tox *tox, int groupnumber, const uint8_t *name, uint16_t length, TOX_ERR_GROUP_SET_NAME *error) {
+    int success = tox_group_set_self_name(tox, groupnumber, name, length);
+    if (success == -1) {
+      if (error) *error = TOX_ERR_GROUP_SET_NAME_FAILED;
+      return false;
+    } else if (success == -2) {
+      if (error) *error = TOX_ERR_GROUP_SET_NAME_TAKEN;
+      return false;
+    } else {
+      if (error) *error = TOX_ERR_GROUP_SET_NAME_OK;
+      return true;
+    }
+}
+
+static ErrorHandling handle_group_set_self_name_error(TOX_ERR_GROUP_SET_NAME error) {
+    switch (error) {
+        success_case(GROUP_SET_NAME);
+        failure_case(GROUP_SET_NAME, FAILED);
+        failure_case(GROUP_SET_NAME, TAKEN);
+    }
+    return unhandled();
+}
+
+ /* Class:     im_tox_tox4jToxCoreImpl
+ * Method:    toxGroupSetSelfName
+ * Signature: (I[B)V
+ */
+JNIEXPORT void JNICALL Java_im_tox_tox4j_ToxCoreImpl_toxGroupSetSelfName
+  (JNIEnv *env, jclass, jint instanceNumber, jint groupNumber, jbyteArray name)
+{
+    ByteArray name_array(env, name);
+    return with_instance(env, instanceNumber, "GroupSetSelfName", handle_group_set_self_name_error, [](bool) {
+    }, new_tox_group_set_self_name, groupNumber, name_array.data(), name_array.size());
+}
+
+bool
+new_tox_group_get_self_name(const Tox *tox, int groupnumber, uint8_t *name)
+{
+    int success = tox_group_get_self_name(tox, groupnumber, name);
+    return success != -1;
+}
+
+size_t
+new_tox_group_get_self_name_size (Tox const *tox, int groupnumber)
+{
+  size_t size = tox_group_get_self_name_size (tox, groupnumber);
+  if (size == 1)
+    {
+      uint8_t name[1];
+
+      tox_group_get_self_name (tox, groupnumber, name);
+      if (name[0] == '\0')
+        size = 0;
+    }
+  return size;
+}
+
+/*
+ * Class:     im_tox_tox4jToxCoreImpl
+ * Method:    toxGroupGetSelfName
+ * Signature: (I)[B
+ */
+JNIEXPORT jbyteArray JNICALL Java_im_tox_tox4j_ToxCoreImpl_toxGroupGetSelfName
+  (JNIEnv *env, jclass, jint instanceNumber, jint groupNumber)
+{
+    return with_instance(env, instanceNumber, [=](Tox *tox, Events &events) -> jbyteArray {
+        unused(events);
+        size_t size = new_tox_group_get_self_name_size(tox, groupNumber);
+        if (size == 0) {
+            return nullptr;
+        }
+        std::vector<uint8_t> name(size);
+        new_tox_group_get_self_name(tox, groupNumber, name.data());
+
+        return toJavaArray(env, name);
+    });
+}
+
 /*
  * Class:     im_tox_tox4jToxCoreImpl
  * Method:    toxSelfGetName
