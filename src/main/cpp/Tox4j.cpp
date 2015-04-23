@@ -2,7 +2,6 @@
 
 #include <tox/tox.h>
 
-
 /*
  * Do setup here. Caching of needed java method IDs etc should be done in this
  * function. It is guaranteed to be called when the library is loaded, and

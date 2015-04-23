@@ -175,8 +175,6 @@ with_instance (JNIEnv *env,
   return with_instance (env, instanceNumber, method, error_func, ignore (), tox_func, args...);
 }
 
-
-#ifdef HAVE_TOXAV
 template<>
 struct tox_traits<ToxAV>
 {
@@ -196,7 +194,6 @@ public:
 
   static char const *const module;
 };
-#endif
 
 
 template<>

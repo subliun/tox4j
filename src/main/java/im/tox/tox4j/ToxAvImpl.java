@@ -21,8 +21,6 @@ public final class ToxAvImpl implements ToxAv {
     private final int instanceNumber;
     private CallCallback callCallback;
     private CallStateCallback callStateCallback;
-    private RequestVideoFrameCallback requestVideoFrameCallback;
-    private RequestAudioFrameCallback requestAudioFrameCallback;
     private ReceiveVideoFrameCallback receiveVideoFrameCallback;
     private ReceiveAudioFrameCallback receiveAudioFrameCallback;
 
@@ -71,21 +69,6 @@ public final class ToxAvImpl implements ToxAv {
         return toxAvIterationInterval(instanceNumber);
     }
 
-
-    private static ToxCallState convert(Av.CallState.Kind kind) {
-        switch (kind) {
-            case RINGING: return ToxCallState.RINGING;
-            case SENDING_NONE: return ToxCallState.SENDING_NONE;
-            case SENDING_A: return ToxCallState.SENDING_A;
-            case SENDING_V: return ToxCallState.SENDING_V;
-            case SENDING_AV: return ToxCallState.SENDING_AV;
-            case PAUSED: return ToxCallState.PAUSED;
-            case END: return ToxCallState.END;
-            case ERROR: return ToxCallState.ERROR;
-        }
-        throw new IllegalStateException("Bad enumerator: " + kind);
-    }
-
     private static native byte[] toxAvIteration(int instanceNumber);
 
     @Override
@@ -106,17 +89,7 @@ public final class ToxAvImpl implements ToxAv {
         }
         if (callStateCallback != null) {
             for (Av.CallState callState : toxEvents.getCallStateList()) {
-                callStateCallback.callState(callState.getFriendNumber(), convert(callState.getState()));
-            }
-        }
-        if (requestAudioFrameCallback != null) {
-            for (Av.RequestAudioFrame requestAudioFrame : toxEvents.getRequestAudioFrameList()) {
-                requestAudioFrameCallback.requestAudioFrame(requestAudioFrame.getFriendNumber());
-            }
-        }
-        if (requestVideoFrameCallback != null) {
-            for (Av.RequestVideoFrame requestVideoFrame : toxEvents.getRequestVideoFrameList()) {
-                requestVideoFrameCallback.requestVideoFrame(requestVideoFrame.getFriendNumber());
+                callStateCallback.callState(callState.getFriendNumber(), callState.getState());
             }
         }
         if (receiveAudioFrameCallback != null) {
@@ -137,8 +110,7 @@ public final class ToxAvImpl implements ToxAv {
                         receiveVideoFrame.getHeight(),
                         receiveVideoFrame.getY().toByteArray(),
                         receiveVideoFrame.getU().toByteArray(),
-                        receiveVideoFrame.getV().toByteArray(),
-                        receiveVideoFrame.hasA() ? receiveVideoFrame.getA().toByteArray() : null
+                        receiveVideoFrame.getV().toByteArray()
                 );
             }
         }
@@ -194,24 +166,12 @@ public final class ToxAvImpl implements ToxAv {
         toxAvSetVideoBitRate(instanceNumber, friendNumber, bitRate);
     }
 
-    @Override
-    public void callbackRequestVideoFrame(@Nullable RequestVideoFrameCallback callback) {
-        this.requestVideoFrameCallback = callback;
-    }
-
-
-    private static native void toxAvSendVideoFrame(int instanceNumber, int friendNumber, int width, int height, byte[] y, byte[] u, byte[] v, byte[] a) throws ToxSendFrameException;
+    private static native void toxAvSendVideoFrame(int instanceNumber, int friendNumber, int width, int height, byte[] y, byte[] u, byte[] v) throws ToxSendFrameException;
 
     @Override
-    public void sendVideoFrame(int friendNumber, int width, int height, @NotNull byte[] y, @NotNull byte[] u, @NotNull byte[] v, @Nullable byte[] a) throws ToxSendFrameException {
-        toxAvSendVideoFrame(instanceNumber, friendNumber, width, height, y, u, v, a);
+    public void sendVideoFrame(int friendNumber, int width, int height, @NotNull byte[] y, @NotNull byte[] u, @NotNull byte[] v) throws ToxSendFrameException {
+        toxAvSendVideoFrame(instanceNumber, friendNumber, width, height, y, u, v);
     }
-
-    @Override
-    public void callbackRequestAudioFrame(@Nullable RequestAudioFrameCallback callback) {
-        this.requestAudioFrameCallback = callback;
-    }
-
 
     private static native void toxAvSendAudioFrame(int instanceNumber, int friendNumber, short[] pcm, int sampleCount, int channels, int samplingRate) throws ToxSendFrameException;
 
@@ -234,8 +194,6 @@ public final class ToxAvImpl implements ToxAv {
     public void callback(@Nullable ToxAvEventListener handler) {
         callbackCall(handler);
         callbackCallControl(handler);
-        callbackRequestAudioFrame(handler);
-        callbackRequestVideoFrame(handler);
         callbackReceiveAudioFrame(handler);
         callbackReceiveVideoFrame(handler);
     }

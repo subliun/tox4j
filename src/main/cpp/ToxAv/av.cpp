@@ -1,6 +1,4 @@
-#ifdef HAVE_TOXAV
 #include "ToxAv.h"
-
 
 /*
  * Class:     im_tox_tox4j_ToxAvImpl
@@ -30,7 +28,7 @@ TOX_METHOD (jbyteArray, Iteration,
   return with_instance (env, instanceNumber,
     [=] (ToxAV *av, Events &events)
       {
-        toxav_iteration (av);
+        toxav_iterate (av);
 
         std::vector<char> buffer (events.ByteSize ());
         events.SerializeToArray (buffer.data (), buffer.size ());
@@ -111,6 +109,7 @@ TOX_METHOD (void, CallControl,
           failure_case (CALL_CONTROL, NOT_PAUSED);
           failure_case (CALL_CONTROL, DENIED);
           failure_case (CALL_CONTROL, ALREADY_PAUSED);
+          failure_case (CALL_CONTROL, NOT_MUTED);
           }
         return unhandled ();
       },
@@ -133,6 +132,8 @@ TOX_METHOD (void, SetAudioBitRate,
           {
           success_case (BIT_RATE);
           failure_case (BIT_RATE, INVALID);
+          failure_case (BIT_RATE, FRIEND_NOT_FOUND);
+          failure_case (BIT_RATE, FRIEND_NOT_IN_CALL);
           }
         return unhandled ();
       },
@@ -155,6 +156,8 @@ TOX_METHOD (void, SetVideoBitRate,
           {
           success_case (BIT_RATE);
           failure_case (BIT_RATE, INVALID);
+          failure_case (BIT_RATE, FRIEND_NOT_FOUND);
+          failure_case (BIT_RATE, FRIEND_NOT_IN_CALL);
           }
         return unhandled ();
       },
@@ -168,20 +171,18 @@ TOX_METHOD (void, SetVideoBitRate,
  * Signature: (IIII[B[B[B[B)V
  */
 TOX_METHOD (void, SendVideoFrame,
-  jint instanceNumber, jint friendNumber, jint width, jint height, jbyteArray y, jbyteArray u, jbyteArray v, jbyteArray a)
+  jint instanceNumber, jint friendNumber, jint width, jint height, jbyteArray y, jbyteArray u, jbyteArray v)
 {
   size_t pixel_count = width * height;
 
   ByteArray yData (env, y);
   ByteArray uData (env, u);
   ByteArray vData (env, v);
-  ByteArray aData (env, a);
   if (yData.size () != pixel_count ||
       uData.size () != pixel_count ||
-      vData.size () != pixel_count ||
-      (!aData.empty () && aData.size () != pixel_count))
+      vData.size () != pixel_count )
     {
-      throw_tox_exception (env, tox_traits::module, "SendFrame", "BAD_LENGTH");
+      throw_tox_exception (env, tox_traits<Subsystem>::module, "SendFrame", "BAD_LENGTH");
       return;
     }
 
@@ -196,10 +197,11 @@ TOX_METHOD (void, SendVideoFrame,
           failure_case (SEND_FRAME, FRIEND_NOT_IN_CALL);
           failure_case (SEND_FRAME, NOT_REQUESTED);
           failure_case (SEND_FRAME, INVALID);
+          failure_case (SEND_FRAME, RTP_FAILED);
           }
         return unhandled ();
       },
-    toxav_send_video_frame, friendNumber, width, height, yData.data (), uData.data (), vData.data (), aData.data ()
+    toxav_send_video_frame, friendNumber, width, height, yData.data (), uData.data (), vData.data ()
   );
 }
 
@@ -213,13 +215,13 @@ TOX_METHOD (void, SendAudioFrame,
 {
   assert (sampleCount >= 0);
   assert (channels >= 0);
-  assert (channels <= 255);
+  assert (channels <= 2);
   assert (samplingRate >= 0);
 
   ShortArray pcmData (env, pcm);
-  if (pcmData.size () != size_t (sampleCount * channels))
+  if (pcmData.size () != size_t (sampleCount))
     {
-      throw_tox_exception (env, tox_traits::module, "SendFrame", "BAD_LENGTH");
+      throw_tox_exception (env, tox_traits<Subsystem>::module, "SendFrame", "BAD_LENGTH");
       return;
     }
 
@@ -234,10 +236,10 @@ TOX_METHOD (void, SendAudioFrame,
           failure_case (SEND_FRAME, FRIEND_NOT_IN_CALL);
           failure_case (SEND_FRAME, NOT_REQUESTED);
           failure_case (SEND_FRAME, INVALID);
+          failure_case (SEND_FRAME, RTP_FAILED);
           }
         return unhandled ();
       },
     toxav_send_audio_frame, friendNumber, pcmData.data (), sampleCount, channels, samplingRate
   );
 }
-#endif

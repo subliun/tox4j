@@ -62,7 +62,7 @@ struct tox_handler_traits<R (T::*) (Subsystem *, Events &) const>
 
 
 /*****************************************************************************
- * Extract the subsystem type (Tox, ToxAV, ...) from the Tox API function.
+ * Extract the subsystem type (Tox, ToxAv, ...) from the Tox API function.
  */
 
 template<typename Func>

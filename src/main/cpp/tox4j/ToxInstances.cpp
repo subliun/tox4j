@@ -5,3 +5,4 @@ instance_manager<Subsystem, Traits>
 instance_manager<Subsystem, Traits>::self;
 
 template instance_manager<Tox> instance_manager<Tox>::self;
+template instance_manager<ToxAV> instance_manager<ToxAV>::self;
