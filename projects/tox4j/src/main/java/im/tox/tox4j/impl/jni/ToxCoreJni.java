@@ -71,6 +71,42 @@ final class ToxCoreJni {
   static native void toxFileSendChunk(int instanceNumber, int friendNumber, int fileNumber, long position, @NotNull byte[] data) throws ToxFileSendChunkException;
   @NotNull
   static native byte[] toxFileGetFileId(int instanceNumber, int friendNumber, int fileNumber) throws ToxFileGetException;
+
+  static native int toxGroupNew(int instanceNumber, int privacyState, byte[] groupName) throws ToxGroupNewException;
+  static native int toxGroupJoin(int instanceNumber, byte[] chatId, byte[] password) throws ToxGroupJoinException;
+  static native void toxGroupReconnect(int instanceNumber, int groupNumber) throws ToxGroupReconnectException;
+  static native void toxGroupLeave(int instanceNumber, int groupNumber, byte[] message) throws ToxGroupLeaveException;
+  static native void toxGroupSelfSetName(int instanceNumber, int groupNumber, byte[] name) throws ToxGroupSelfNameSetException;
+  static native byte[] toxGroupSelfGetName(int instanceNumber, int groupNumber) throws ToxGroupSelfQueryException;
+  static native void toxGroupSelfSetStatus(int instanceNumber, int groupNumber, int status) throws ToxGroupSelfStatusSetException;
+  static native int toxGroupSelfGetStatus(int instanceNumber, int groupNumber) throws ToxGroupSelfQueryException;
+  static native int toxGroupSelfGetRole(int instanceNumber, int groupNumber) throws ToxGroupSelfQueryException;
+  static native byte[] toxGroupPeerGetName(int instanceNumber, int groupNumber, int peerNumber) throws ToxGroupPeerQueryException;
+  static native int toxGroupPeerGetStatus(int instanceNumber, int groupNumber, int peerNumber) throws ToxGroupPeerQueryException;
+  static native int toxGroupPeerGetRole(int instanceNumber, int groupNumber, int peerNumber) throws ToxGroupPeerQueryException;
+  static native void toxGroupSetTopic(int instanceNumber, int groupNumber, byte[] topic) throws ToxGroupTopicSetException;
+  static native byte[] toxGroupGetTopic(int instanceNumber, int groupNumber) throws ToxGroupStateQueriesException;
+  static native byte[] toxGroupGetName(int instanceNumber, int groupNumber) throws ToxGroupStateQueriesException;
+  static native byte[] toxGroupGetChatId(int instanceNumber, int groupNumber) throws ToxGroupStateQueriesException;
+  static native int toxGroupGetNumberPeers(int instanceNumber, int groupNumber) throws ToxGroupStateQueriesException;
+  static native int toxGroupGetNumberGroups(int instanceNumber);
+  static native int toxGroupGetPrivacyState(int instanceNumber, int groupNumber) throws ToxGroupStateQueriesException;
+  static native int toxGroupGetPeerLimit(int instanceNumber, int groupNumber) throws ToxGroupStateQueriesException;
+  static native byte[] toxGroupGetPassword(int instanceNumber, int groupNumber) throws ToxGroupStateQueriesException;
+  static native void toxGroupSendMessage(int instanceNumber, int groupNumber, int type, byte[] message) throws ToxGroupSendMessageException;
+  static native void toxGroupSendPrivateMessage(int instanceNumber, int groupNumber, int peerNumber, byte[] message) throws ToxGroupSendPrivateMessageException;
+  static native void toxGroupInviteFriend(int instanceNumber, int groupNumber, int friendNumber) throws ToxGroupInviteFriendException;
+  static native int toxGroupInviteAccept(int instanceNumber, byte[] inviteData, byte[] password) throws ToxGroupInviteAcceptException;
+  static native void toxGroupFounderSetPassword(int instanceNumber, int groupNumber, byte[] password) throws ToxGroupFounderSetPasswordException;
+  static native void toxGroupFounderSetPrivacyState(int instanceNumber, int groupNumber, int privacyState) throws ToxGroupFounderSetPrivacyStateException;
+  static native void toxGroupFounderSetPeerLimit(int instanceNumber, int groupNumber, int maxPeers) throws ToxGroupFounderSetPeerLimitException;
+  static native void toxGroupToggleIgnore(int instanceNumber, int groupNumber, int peerNumber, boolean ignore) throws ToxGroupToggleIgnoreException;
+  static native void toxGroupModSetRole(int instanceNumber, int groupNumber, int peerNumber, int role) throws ToxGroupModSetRoleException;
+  static native void toxGroupModRemovePeer(int instanceNumber, int groupNumber, int peerNumber, boolean setBan) throws ToxGroupModRemovePeerException;
+  static native void toxGroupModRemoveBan(int instanceNumber, int groupNumber, short banId) throws ToxGroupModRemoveBanException;
+  static native short[] toxGroupBanGetList(int instanceNumber, int groupNumber) throws ToxGroupBanQueryException;
+  static native byte[] toxGroupBanGetName(int instanceNumber, int groupNumber, short banId) throws ToxGroupBanQueryException;
+  static native long toxGroupBanGetTimeSet(int instanceNumber, int groupNumber, short banId) throws ToxGroupBanQueryException;
   static native void toxSendLossyPacket(int instanceNumber, int friendNumber, @NotNull byte[] data) throws ToxFriendCustomPacketException;
   static native void toxSendLosslessPacket(int instanceNumber, int friendNumber, @NotNull byte[] data) throws ToxFriendCustomPacketException;
 

@@ -50,7 +50,25 @@ object WartRemoverOverrides extends OptionalPlugin {
         "InternalFields_coreProto",
         "MessageType",
         "SelfConnectionStatus",
-        "UserStatus"
+        "UserStatus",
+        "PrivacyState",
+        "JoinFail",
+        "GroupModEvent",
+        "GroupPeerName",
+        "GroupPeerStatus",
+        "GroupTopic",
+        "GroupPrivacyState",
+        "GroupPeerLimit",
+        "GroupPassword",
+        "GroupPeerlistUpdate",
+        "GroupMessage",
+        "GroupPrivateMessage",
+        "GroupInvite",
+        "GroupPeerJoin",
+        "GroupPeerExit",
+        "GroupSelfJoin",
+        "GroupJoinFail",
+        "GroupModeration"
       ).map(_ + ".scala").map(proto / "core" / "proto" / "Core" / _)
 
       avProtos ++ coreProtos

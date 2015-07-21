@@ -147,5 +147,129 @@
   },
   "SetTyping": {
     "FRIEND_NOT_FOUND": ["The friendNumber passed did not designate a valid friend."]
+  },
+  "GroupNew": {
+    "TOO_LONG": ["The group name exceeded {@link ToxCoreConstants#GROUP_MAX_GROUP_NAME_LENGTH}."],
+    "EMPTY": ["groupName is null or length is zero."],
+    "PRIVACY": ["ToxGroupPrivacyState is an invalid type."],
+    "INIT": ["The group instance failed to initialize."],
+    "STATE": ["The group state failed to initialize. This usually indicates that something went wrongrelated to cryptographic signing."],
+    "ANNOUNCE": ["The group failed to announce to the DHT. This indicates a network related error."]
+  },
+  "GroupSendMessage": {
+    "GROUP_NOT_FOUND": ["The group number passed did not designate a valid group."],
+    "TOO_LONG": ["Message length exceeded {@link ToxCoreConstants#MAX_MESSAGE_LENGTH}."],
+    "EMPTY": ["The message length is zero."],
+    "BAD_TYPE": ["The message type is invalid."],
+    "PERMISSIONS": ["The caller does not have the required permissions to send group messages."],
+    "FAIL_SEND": ["Packet failed to send."]
+  },
+  "GroupReconnect": {
+    "GROUP_NOT_FOUND": ["The group number passed did not designate a valid group."]
+  },
+  "GroupLeave": {
+    "GROUP_NOT_FOUND": ["The group number passed did not designate a valid group."],
+    "TOO_LONG": ["Message length exceeded {@link ToxCoreConstants#GROUP_MAX_PART_LENGTH}."],
+    "FAIL_SEND": ["The parting packet failed to send."],
+    "DELETE_FAIL": ["The group chat instance failed to be deleted. This may occur due to memory related errors."]
+  },
+  "GroupInviteFriend": {
+    "GROUP_NOT_FOUND": ["The group number passed did not designate a valid group."],
+    "FRIEND_NOT_FOUND": ["The friend number passed did not designate a valid friend."],
+    "INVITE_FAIL": ["Creation of the invite packet failed. This indicates a network related error."],
+    "FAIL_SEND": ["Packet failed to send."]
+  },
+  "GroupSelfStatusSet": {
+    "GROUP_NOT_FOUND": ["The group number passed did not designate a valid group."],
+    "INVALID": ["An invalid type was passed to the set function."],
+    "FAIL_SEND": ["The packet failed to send."]
+  },
+  "GroupModSetRole": {
+    "GROUP_NOT_FOUND": ["The group number passed did not designate a valid group."],
+    "PEER_NOT_FOUND": ["The peer number passed did not designate a valid peer. Note: you cannot set your own role."],
+    "PERMISSIONS": ["The caller does not have the required permissions for this action."],
+    "ASSIGNMENT": ["The role assignment is invalid. This will occur if you try to set a peer's role tothe role they already have."],
+    "FAIL_ACTION": ["The role was not successfully set. This may occur if something goes wrong with role setting,or if the packet fails to send."]
+  },
+  "GroupFounderSetPrivacyState": {
+    "GROUP_NOT_FOUND": ["The group number passed did not designate a valid group."],
+    "INVALID": ["ToxGroupPrivacyState is an invalid type."],
+    "PERMISSIONS": ["The caller does not have the required permissions to set the privacy state."],
+    "FAIL_SET": ["The privacy state could not be set. This may occur due to an error related tocryptographic signing of the new shared state."],
+    "FAIL_SEND": ["The packet failed to send."]
+  },
+  "GroupFounderSetPeerLimit": {
+    "GROUP_NOT_FOUND": ["The group number passed did not designate a valid group."],
+    "PERMISSIONS": ["The caller does not have the required permissions to set the peer limit."],
+    "FAIL_SET": ["The peer limit could not be set. This may occur due to an error related tocryptographic signing of the new shared state."],
+    "FAIL_SEND": ["The packet failed to send."]
+  },
+  "GroupToggleIgnore": {
+    "GROUP_NOT_FOUND": ["The group number passed did not designate a valid group."],
+    "PEER_NOT_FOUND": ["The peer number passed did not designate a valid peer."]
+  },
+  "GroupModRemoveBan": {
+    "GROUP_NOT_FOUND": ["The group number passed did not designate a valid group."],
+    "PERMISSIONS": ["The caller does not have the required permissions for this action."],
+    "FAIL_ACTION": ["The ban entry could not be removed. This may occur if ban_id does not designatea valid ban entry."],
+    "FAIL_SEND": ["The packet failed to send."]
+  },
+  "GroupSelfQuery": {
+    "GROUP_NOT_FOUND": ["The group number passed did not designate a valid group."]
+  },
+  "GroupBanQuery": {
+    "GROUP_NOT_FOUND": ["The group number passed did not designate a valid group."],
+    "BAD_ID": ["The ban ID does not designate a valid ban list entry."]
+  },
+  "GroupTopicSet": {
+    "GROUP_NOT_FOUND": ["The group number passed did not designate a valid group."],
+    "TOO_LONG": ["Topic length exceeded {@link ToxCoreConstants#GROUP_MAX_TOPIC_LENGTH}."],
+    "PERMISSIONS": ["The caller does not have the required permissions to set the topic."],
+    "FAIL_SEND": ["The packet failed to send."]
+  },
+  "GroupStateQueries": {
+    "GROUP_NOT_FOUND": ["The group number passed did not designate a valid group."]
+  },
+  "GroupInviteAccept": {
+    "BAD_INVITE": ["The invite data is not in the expected format."],
+    "INIT_FAILED": ["The group instance failed to initialize."],
+    "TOO_LONG": ["Password length exceeded {@link ToxCoreConstants#GROUP_MAX_PASSWORD_SIZE}."]
+  },
+  "GroupModRemovePeer": {
+    "GROUP_NOT_FOUND": ["The group number passed did not designate a valid group."],
+    "PEER_NOT_FOUND": ["The peer number passed did not designate a valid peer."],
+    "PERMISSIONS": ["The caller does not have the required permissions for this action."],
+    "FAIL_ACTION": ["The peer failed to be removed from the group. If a ban was set, this error indicatesthat the ban entry could not be created. This may either be due to the entry containinginvalid peer information, or a failure to cryptographically authenticate the entry."],
+    "FAIL_SEND": ["The packet failed to send."]
+  },
+  "GroupPeerQuery": {
+    "GROUP_NOT_FOUND": ["The group number passed did not designate a valid group."],
+    "PEER_NOT_FOUND": ["The peer number passed did not designate a valid peer."]
+  },
+  "GroupFounderSetPassword": {
+    "GROUP_NOT_FOUND": ["The group number passed did not designate a valid group."],
+    "PERMISSIONS": ["The caller does not have the required permissions to set the password."],
+    "TOO_LONG": ["Password length exceeded {@link ToxCoreConstants#GROUP_MAX_PASSWORD_SIZE}."],
+    "FAIL_SEND": ["The packet failed to send."]
+  },
+  "GroupSelfNameSet": {
+    "GROUP_NOT_FOUND": ["The group number passed did not designate a valid group."],
+    "TOO_LONG": ["Name length exceeded {@link ToxCoreConstants#MAX_NAME_LENGTH}."],
+    "INVALID": ["The length given to the set function is zero or name is null"],
+    "TAKEN": ["The name is already taken by another peer in the group."],
+    "FAIL_SEND": ["The packet failed to send."]
+  },
+  "GroupSendPrivateMessage": {
+    "GROUP_NOT_FOUND": ["The group number passed did not designate a valid group."],
+    "PEER_NOT_FOUND": ["The peer number passed did not designate a valid peer."],
+    "TOO_LONG": ["Message length exceeded {@link ToxCoreConstants#MAX_MESSAGE_LENGTH}."],
+    "EMPTY": ["The message length is zero."],
+    "PERMISSIONS": ["The caller does not have the required permissions to send group messages."],
+    "FAIL_SEND": ["Packet failed to send."]
+  },
+  "GroupJoin": {
+    "INIT": ["The group instance failed to initialize."],
+    "BAD_CHAT_ID": ["The chat_id is null."],
+    "TOO_LONG": ["Password length exceeded {@link ToxCoreConstants#GROUP_MAX_PASSWORD_SIZE}."]
   }
 }]

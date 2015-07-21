@@ -3,10 +3,11 @@ package im.tox.tox4j.core
 import java.io.Closeable
 
 import im.tox.tox4j.core.callbacks._
-import im.tox.tox4j.core.enums.{ ToxFileControl, ToxMessageType, ToxUserStatus }
+import im.tox.tox4j.core.enums._
 import im.tox.tox4j.core.exceptions._
 import im.tox.tox4j.core.options.ToxOptions
 import org.jetbrains.annotations.NotNull
+import org.jetbrains.annotations.Nullable
 
 /**
  * Interface for a basic wrapper of tox chat functionality.
@@ -471,6 +472,377 @@ trait ToxCore[ToxCoreState] extends Closeable {
    */
   @throws[ToxFileSendChunkException]
   def fileSendChunk(friendNumber: Int, fileNumber: Int, position: Long, @NotNull data: Array[Byte]): Unit
+
+  /**
+   * Creates a new group chat.
+   *
+   * This function creates a new group chat object adds it to the chats array.
+   *
+   * @param privacyState The privacy state of the group. If this is set to [[ToxGroupPrivacyState.PUBLIC]],
+   *   the group will attempt to announce itself to the DHT and anyone with the Chat ID may join.
+   *   Otherwise a friend invite will be required to join the group.
+   * @param groupName The name of the group.
+   *
+   * @return groupNumber
+   */
+  @throws[ToxGroupNewException]
+  def groupNew(privacyState: ToxGroupPrivacyState, @NotNull groupName: Array[Byte]): Int
+
+  /**
+   * Joins a group chat with specified Chat ID.
+   *
+   * This function creates a new group chat object, adds it to the chats array, and sends
+   * a DHT announcement to find peers in the group associated with chatId. Once a peer has been
+   * found a join attempt will be initiated.
+   *
+   * @param chatId The Chat ID of the group you wish to join. This must be [[ToxCoreConstants.GROUP_CHAT_ID_SIZE]] bytes.
+   * @param password The password required to join the group. Set to null if no password is required.
+   *
+   * @return groupNumber on success
+   */
+  @throws[ToxGroupJoinException]
+  def groupJoin(@NotNull chatId: Array[Byte], @Nullable password: Array[Byte]): Int
+
+  /**
+   * Reconnects to a group.
+   *
+   * This function disconnects from all peers in the group, then attempts to reconnect with the group.
+   * The caller's state is not changed (i.e. name, status, role, chat public key etc.)
+   *
+   * @param groupNumber The group number of the group we wish to reconnect to.
+   */
+  @throws[ToxGroupReconnectException]
+  def groupReconnect(groupNumber: Int): Unit
+
+  /**
+   * Leaves a group.
+   *
+   * This function sends a parting packet containing a custom (non-obligatory) message to all
+   * peers in a group, and deletes the group from the chat array. All group state information is permanently
+   * lost, including keys and role credentials.
+   *
+   * @param groupNumber The group number of the group we wish to leave.
+   * @param message The parting message to be sent to all the peers. Set to null if we do not wish to
+   *   send a parting message.
+   */
+  @throws[ToxGroupLeaveException]
+  def groupLeave(groupNumber: Int, @Nullable message: Array[Byte]): Unit
+
+  /**
+   * Set the client's nickname for the group instance designated by the given group number.
+   *
+   * Nickname length cannot exceed [[ToxCoreConstants.MAX_NAME_LENGTH]].
+   *
+   * @param name A byte array containing the new nickname.
+   */
+  @throws[ToxGroupSelfNameSetException]
+  def setGroupSelfName(groupNumber: Int, name: Array[Byte]): Unit
+
+  /**
+   * Get the client's nickname for the group instance designated by the given group number.
+   *
+   * If no nickname was set before calling this function, the name is empty,
+   * and this function has no effect.
+   *
+   * @param groupNumber The group number of the group to get the nickname from.
+   *
+   * @return the client's nickname for the group
+   */
+  @throws[ToxGroupSelfQueryException]
+  def getGroupSelfName(groupNumber: Int): Array[Byte]
+
+  /**
+   * Set the client's status for the group instance. Status must be a [[ToxUserStatus]].
+   */
+  @throws[ToxGroupSelfStatusSetException]
+  def setGroupSelfStatus(groupNumber: Int, status: ToxUserStatus): Unit
+
+  /**
+   * Get the client's status for the group instance.
+   *
+   * @return the client's status
+   */
+  @throws[ToxGroupSelfQueryException]
+  def getGroupSelfStatus(groupNumber: Int): ToxUserStatus
+
+  /**
+   * Get the client's role for the group instance.
+   */
+  @throws[ToxGroupSelfQueryException]
+  def getGroupSelfRole(groupNumber: Int): ToxGroupRole
+
+  /**
+   * Write the name of the peer designated by the given peer number to a byte
+   * array.
+   *
+   * The data returned is equal to the data received by the last
+   * [[GroupPeerNameCallback]] callback.
+   *
+   * @param groupNumber The group number of the group we wish to query.
+   * @param peerNumber The peer number of the peer whose name we want to retrieve.
+   */
+  @throws[ToxGroupPeerQueryException]
+  def getGroupPeerName(groupNumber: Int, peerNumber: Int): Array[Byte]
+
+  /**
+   * Get the peer's user status (away/busy/...)
+   *
+   * The status returned is equal to the last status received through the
+   * [[GroupPeerStatusCallback]] callback.
+   */
+  @throws[ToxGroupPeerQueryException]
+  def getGroupPeerStatus(groupNumber: Int, peerNumber: Int): ToxUserStatus
+
+  /**
+   * Get the peer's role (user/moderator/founder...).
+   *
+   * The role returned is equal to the last role received through the
+   * [[GroupModerationCallback]] callback.
+   */
+  @throws[ToxGroupPeerQueryException]
+  def getGroupPeerRole(groupNumber: Int, peerNumber: Int): ToxGroupRole
+
+  /**
+   * Set the group topic and broadcast it to the rest of the group.
+   *
+   * topic length cannot be longer than [[ToxCoreConstants.GROUP_MAX_TOPIC_LENGTH]]. If length is equal to zero or
+   * topic is set to null, the topic will be unset.
+   */
+  @throws[ToxGroupTopicSetException]
+  def setGroupTopic(groupNumber: Int, @Nullable topic: Array[Byte]): Unit
+
+  /**
+   * Get the topic designated by the given group number.
+   *
+   * The data returned is equal to the data received by the last
+   * [[GroupTopicCallback]] callback.
+   *
+   */
+  @throws[ToxGroupStateQueriesException]
+  def getGroupTopic(groupNumber: Int): Array[Byte]
+
+  /**
+   * Get the name of the group designated by the given group number.
+   */
+  @throws[ToxGroupStateQueriesException]
+  def getGroupName(groupNumber: Int): Array[Byte]
+
+  /**
+   * Get the Chat ID designated by the given group number.
+   *
+   * @return a byte array of size [[ToxCoreConstants.GROUP_CHAT_ID_SIZE]] bytes.
+   */
+  @throws[ToxGroupStateQueriesException]
+  def getGroupChatId(groupNumber: Int): Array[Byte]
+
+  /**
+   * Get the number of peers in the group designated by the given group number.
+   *
+   * @see peerNumbers for further information on the implications of the return value.
+   */
+  @throws[ToxGroupStateQueriesException]
+  def getGroupNumberPeers(groupNumber: Int): Int
+
+  /**
+   * Get the number of groups in the Tox chats array.
+   */
+  def getGroupNumberGroups: Int
+
+  /**
+   * Get the privacy state of the group designated by the given group number.
+   */
+  @throws[ToxGroupStateQueriesException]
+  def getGroupPrivacyState(groupNumber: Int): ToxGroupPrivacyState
+
+  /**
+   * Get the maximum number of peers allowed for the group designated by the given group number.
+   *
+   * The value returned is equal to the data received by the last
+   * [[GroupPeerLimitCallback]] callback.
+   */
+  @throws[ToxGroupStateQueriesException]
+  def getGroupPeerLimit(groupNumber: Int): Int
+
+  /**
+   * Get the password for the group designated by the given group number.
+   *
+   * The data received is equal to the data received by the last
+   * [[GroupPasswordCallback]] callback.
+   */
+  @throws[ToxGroupStateQueriesException]
+  def getGroupPassword(groupNumber: Int): Array[Byte]
+
+  /**
+   * Send a text chat message to the entire group.
+   *
+   * This function creates a group message packet and pushes it into the send
+   * queue.
+   *
+   * The message length may not exceed [[ToxCoreConstants.MAX_MESSAGE_LENGTH]]. Larger messages
+   * must be split by the client and sent as separate messages. Other clients can
+   * then reassemble the fragments. Messages may not be empty.
+   *
+   * @param groupNumber The group number of the group the message is intended for.
+   * @param messageType Message type (normal, action, ...).
+   * @param message A byte array containing the message text.
+   */
+  @throws[ToxGroupSendMessageException]
+  def groupSendMessage(groupNumber: Int, messageType: ToxMessageType, message: Array[Byte]): Unit
+
+  /**
+   * Send a text chat message to the specified peer in the specified group.
+   *
+   * This function creates a group private message packet and pushes it into the send
+   * queue.
+   *
+   * The message length may not exceed [[ToxCoreConstants.MAX_MESSAGE_LENGTH]]. Larger messages
+   * must be split by the client and sent as separate messages. Other clients can
+   * then reassemble the fragments. Messages may not be empty.
+   *
+   * @param groupNumber The group number of the group the message is intended for.
+   * @param peerNumber The peer number of the peer the message is intended for.
+   * @param message A byte array containing the message text.
+   */
+  @throws[ToxGroupSendPrivateMessageException]
+  def groupSendPrivateMessage(groupNumber: Int, peerNumber: Int, message: Array[Byte]): Unit
+
+  /**
+   * Invite a friend to a group.
+   *
+   * This function creates an invite request packet and pushes it to the send queue.
+   *
+   * @param groupNumber The group number of the group the message is intended for.
+   * @param friendNumber The friend number of the friend the invite is intended for.
+   */
+  @throws[ToxGroupInviteFriendException]
+  def groupInviteFriend(groupNumber: Int, friendNumber: Int): Unit
+
+  /**
+   * Accept an invite to a group chat that the client previously received from a friend. The invite
+   * is only valid while the inviter is present in the group.
+   *
+   * @param inviteData The invite data received from the [[GroupInviteCallback]] callback.
+   * @param password The password required to join the group. Set to null if no password is required.
+   *                 Must be no larger than [[ToxCoreConstants.GROUP_MAX_PASSWORD_SIZE]].
+   *
+   * @return the group number
+   */
+  @throws[ToxGroupInviteAcceptException]
+  def groupInviteAccept(@NotNull inviteData: Array[Byte], @Nullable password: Array[Byte]): Int
+
+  /**
+   * Set or unset the group password.
+   *
+   * This function sets the groups password, creates a new group shared state including the change,
+   * and distributes it to the rest of the group.
+   *
+   * @param groupNumber The group number of the group for which we wish to set the password.
+   * @param password The password we want to set. Set password to null to unset the password.
+   *                 Must be no longer than [[ToxCoreConstants.GROUP_MAX_PASSWORD_SIZE]].
+   */
+  @throws[ToxGroupFounderSetPasswordException]
+  def setGroupFounderPassword(groupNumber: Int, @Nullable password: Array[Byte]): Unit
+
+  /**
+   * Set the group privacy state.
+   *
+   * This function sets the group's privacy state, creates a new group shared state
+   * including the change, and distributes it to the rest of the group.
+   *
+   * If an attempt is made to set the privacy state to the same state that the group is already
+   * in, the function call will be successful and no action will be taken.
+   *
+   * @param groupNumber The group number of the group for which we wish to change the privacy state.
+   * @param privacyState The privacy state we wish to set the group to.
+   */
+  @throws[ToxGroupFounderSetPrivacyStateException]
+  def setGroupFounderPrivacyState(groupNumber: Int, privacyState: ToxGroupPrivacyState): Unit
+
+  /**
+   * Set the group peer limit.
+   *
+   * This function sets a limit for the number of peers who may be in the group, creates a new
+   * group shared state including the change, and distributes it to the rest of the group.
+   *
+   * @param groupNumber The group number of the group for which we wish to set the peer limit.
+   * @param maxPeers The maximum number of peers to allow in the group.
+   */
+  @throws[ToxGroupFounderSetPeerLimitException]
+  def setGroupFounderPeerLimit(groupNumber: Int, maxPeers: Int): Unit
+
+  /**
+   * Ignore or unignore a peer.
+   *
+   * @param groupNumber The group number of the group the in which you wish to ignore a peer.
+   * @param peerNumber The peer number of the peer who shall be ignored or unignored.
+   * @param ignore True to ignore the peer, false to unignore the peer.
+   */
+  @throws[ToxGroupToggleIgnoreException]
+  def groupToggleIgnore(groupNumber: Int, peerNumber: Int, ignore: Boolean): Unit
+
+  /**
+   * Set a peer's role.
+   *
+   * This function will first remove the peer's previous role and then assign them a new role.
+   * It will also send a packet to the rest of the group, requesting that they perform
+   * the role reassignment. Note: peers cannot be set to the founder role.
+   *
+   * @param groupNumber The group number of the group the in which you wish set the peer's role.
+   * @param peerNumber The peer number of the peer whose role you wish to set.
+   * @param role The role you wish to set the peer to.
+   */
+  @throws[ToxGroupModSetRoleException]
+  def setGroupModRole(groupNumber: Int, peerNumber: Int, role: ToxGroupRole): Unit
+
+  /**
+   * Kick/ban a peer.
+   *
+   * This function will remove a peer from the caller's peer list and optionally add their IP address
+   * to the ban list. It will also send a packet to all group members requesting them
+   * to do the same.
+   *
+   * @param groupNumber The group number of the group the ban is intended for.
+   * @param peerNumber The peer number of the peer who will be kicked and/or added to the ban list.
+   * @param setBan Set to true if a ban shall be set on the peer's IP address.
+   */
+  @throws[ToxGroupModRemovePeerException]
+  def groupModRemovePeer(groupNumber: Int, peerNumber: Int, setBan: Boolean): Unit
+
+  /**
+   * Removes a ban.
+   *
+   * This function removes a ban entry from the ban list, and sends a packet to the rest of
+   * the group requesting that they do the same.
+   *
+   * @param groupNumber The group number of the group in which the ban is to be removed.
+   * @param banId The ID of the ban entry that shall be removed.
+   */
+  @throws[ToxGroupModRemoveBanException]
+  def groupModRemoveBan(groupNumber: Int, banId: Short): Unit
+
+  /**
+   * Get a list of valid ban list ID's.
+   *
+   * @return a list of ban ID's
+   */
+  @throws[ToxGroupBanQueryException]
+  def getGroupBanList(groupNumber: Int): Array[Short]
+
+  /**
+   * Get the name of the ban entry designated by banId in the group designated by the
+   * given group number as a byte array.
+   *
+   * @return the name
+   */
+  @throws[ToxGroupBanQueryException]
+  def getGroupBanName(groupNumber: Int, banId: Short): Array[Byte]
+
+  /**
+   * Return a time stamp indicating the time the ban was set, for the ban list entry
+   * designated by banId, in the group designated by the given group number.
+   */
+  @throws[ToxGroupBanQueryException]
+  def getGroupBanTimeSet(groupNumber: Int, banId: Short): Long
 
   /**
    * Send a custom lossy packet to a friend.

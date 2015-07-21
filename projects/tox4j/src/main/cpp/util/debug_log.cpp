@@ -78,6 +78,8 @@ template void print_arg<  signed long     > (  signed long     );
 template void print_arg<unsigned long     > (unsigned long     );
 template void print_arg<  signed long long> (  signed long long);
 template void print_arg<unsigned long long> (unsigned long long);
+template void print_arg<  signed short    > (  signed short    );
+template void print_arg<unsigned short    > (unsigned short    );
 
 template<>
 void

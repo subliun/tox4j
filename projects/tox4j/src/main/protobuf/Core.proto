@@ -36,7 +36,31 @@ message FileControl {
   }
 }
 
+message PrivacyState {
+  enum Type {
+    PUBLIC = 0;
+    PRIVATE = 1;
+  }
+}
 
+message JoinFail {
+  enum Type {
+    NAME_TAKEN = 0;
+    PEER_LIMIT = 1;
+    INVALID_PASSWORD = 2;
+    UNKNOWN = 3;
+  }
+}
+
+message GroupModEvent {
+  enum Type {
+    KICK = 0;
+    BAN = 1;
+    OBSERVER = 2;
+    USER = 3;
+    MODERATOR = 4;
+  }
+}
 
 message SelfConnectionStatus {
   required Connection.Type connection_status = 1;
@@ -123,6 +147,88 @@ message FriendLosslessPacket {
   required bytes  data                 = 2;
 }
 
+message GroupPeerName {
+  required uint32 group_number         = 1;
+  required uint32 peer_number          = 2;
+  required bytes  name                 = 3;
+}
+
+message GroupPeerStatus {
+  required uint32 group_number         = 1;
+  required uint32 peer_number          = 2;
+  required UserStatus.Type status      = 3;
+}
+
+message GroupTopic {
+  required uint32 group_number         = 1;
+  required uint32 peer_number          = 2;
+  required bytes topic                 = 3;
+}
+
+message GroupPrivacyState {
+  required uint32 group_number         = 1;
+  required PrivacyState.Type privacy_state = 2;
+}
+
+message GroupPeerLimit {
+  required uint32 group_number         = 1;
+  required uint32 peer_limit           = 2;
+}
+
+message GroupPassword {
+  required uint32 group_number         = 1;
+  required bytes password              = 2;
+}
+
+message GroupPeerlistUpdate {
+  required uint32 group_number         = 1;
+}
+
+message GroupMessage {
+  required uint32 group_number         = 1;
+  required uint32 peer_number          = 2;
+  required MessageType.Type type       = 3;
+  required bytes message               = 4;
+}
+
+message GroupPrivateMessage {
+  required uint32 group_number         = 1;
+  required uint32 peer_number          = 2;
+  required bytes message               = 3;
+}
+
+message GroupInvite {
+  required uint32 friend_number        = 1;
+  required bytes invite_data           = 2;
+}
+
+message GroupPeerJoin {
+  required uint32 group_number         = 1;
+  required uint32 peer_number          = 2;
+}
+
+message GroupPeerExit {
+  required uint32 group_number         = 1;
+  required uint32 peer_number          = 2;
+  required bytes part_message          = 3;
+}
+
+message GroupSelfJoin {
+  required uint32 group_number         = 1;
+}
+
+message GroupJoinFail {
+  required uint32 group_number         = 1;
+  required JoinFail.Type type          = 2;
+}
+
+message GroupModeration {
+  required uint32 group_number         = 1;
+  required uint32 source_peer_number   = 2;
+  required uint32 target_peer_number   = 3;
+  required GroupModEvent.Type type     = 4;
+}
+
 message CoreEvents {
   repeated SelfConnectionStatus   self_connection_status   =  1;
   repeated FriendName             friend_name              =  2;
@@ -139,4 +245,19 @@ message CoreEvents {
   repeated FileRecvChunk          file_recv_chunk          = 13;
   repeated FriendLossyPacket      friend_lossy_packet      = 14;
   repeated FriendLosslessPacket   friend_lossless_packet   = 15;
+  repeated GroupPeerName          group_peer_name          = 16;
+  repeated GroupPeerStatus        group_peer_status        = 17;
+  repeated GroupTopic             group_topic              = 18;
+  repeated GroupPrivacyState      group_privacy_state      = 19;
+  repeated GroupPeerLimit         group_peer_limit         = 20;
+  repeated GroupPassword          group_password           = 21;
+  repeated GroupPeerlistUpdate    group_peerlist_update    = 22;
+  repeated GroupMessage           group_message            = 23;
+  repeated GroupPrivateMessage    group_private_message    = 24;
+  repeated GroupInvite            group_invite             = 25;
+  repeated GroupPeerJoin          group_peer_join          = 26;
+  repeated GroupPeerExit          group_peer_exit          = 27;
+  repeated GroupSelfJoin          group_self_join          = 28;
+  repeated GroupJoinFail          group_join_fail          = 29;
+  repeated GroupModeration        group_moderation         = 30;
 }

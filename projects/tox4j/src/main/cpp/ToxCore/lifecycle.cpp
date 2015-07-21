@@ -22,6 +22,41 @@ set_connection_status (Message &msg, TOX_CONNECTION connection_status)
     }
 }
 
+template<typename Message>
+static void
+set_message_type (Message &msg, TOX_MESSAGE_TYPE type)
+{
+  using proto::MessageType;
+  switch (type)
+    {
+    case TOX_MESSAGE_TYPE_NORMAL:
+      msg->set_type (MessageType::NORMAL);
+      break;
+    case TOX_MESSAGE_TYPE_ACTION:
+      msg->set_type (MessageType::ACTION);
+      break;
+    }
+}
+
+template<typename Message>
+static void
+set_user_status (Message &msg, TOX_USER_STATUS status)
+{
+    using proto::UserStatus;
+    switch (status)
+      {
+      case TOX_USER_STATUS_NONE:
+        msg->set_status (UserStatus::NONE);
+        break;
+      case TOX_USER_STATUS_AWAY:
+        msg->set_status (UserStatus::AWAY);
+        break;
+      case TOX_USER_STATUS_BUSY:
+        msg->set_status (UserStatus::BUSY);
+        break;
+      }
+}
+
 static void
 tox4j_self_connection_status_cb (Tox *tox, TOX_CONNECTION connection_status, Events &events)
 {
@@ -55,19 +90,7 @@ tox4j_friend_status_cb (Tox *tox, uint32_t friend_number, TOX_USER_STATUS status
   auto msg = events.add_friend_status ();
   msg->set_friend_number (friend_number);
 
-  using proto::UserStatus;
-  switch (status)
-    {
-    case TOX_USER_STATUS_NONE:
-      msg->set_status (UserStatus::NONE);
-      break;
-    case TOX_USER_STATUS_AWAY:
-      msg->set_status (UserStatus::AWAY);
-      break;
-    case TOX_USER_STATUS_BUSY:
-      msg->set_status (UserStatus::BUSY);
-      break;
-    }
+  set_user_status(msg, status);
 }
 
 static void
@@ -113,18 +136,7 @@ tox4j_friend_message_cb (Tox *tox, uint32_t friend_number, TOX_MESSAGE_TYPE type
   debug_log (tox4j_friend_message_cb, tox, friend_number, message, length);
   auto msg = events.add_friend_message ();
   msg->set_friend_number (friend_number);
-
-  using proto::MessageType;
-  switch (type)
-    {
-    case TOX_MESSAGE_TYPE_NORMAL:
-      msg->set_type (MessageType::NORMAL);
-      break;
-    case TOX_MESSAGE_TYPE_ACTION:
-      msg->set_type (MessageType::ACTION);
-      break;
-    }
-
+  set_message_type (msg, type);
   msg->set_time_delta (0);
   msg->set_message (message, length);
 }
@@ -204,6 +216,193 @@ tox4j_friend_lossless_packet_cb (Tox *tox, uint32_t friend_number, uint8_t const
   msg->set_data (data, length);
 }
 
+static void
+tox4j_group_peer_name_cb (Tox *tox, uint32_t group_number, uint32_t peer_number, const uint8_t *name, size_t length, Events &events)
+{
+    debug_log (tox4j_group_peer_name_cb, tox, group_number, peer_number, name, length);
+    auto msg = events.add_group_peer_name ();
+	msg->set_group_number (group_number);
+	msg->set_peer_number (peer_number);
+	msg->set_name (name, length);
+}
+
+static void
+tox4j_group_peer_status_cb (Tox *tox, uint32_t group_number, uint32_t peer_number, TOX_USER_STATUS status, Events &events)
+{
+    debug_log (tox4j_group_peer_status_cb, tox, group_number, peer_number, status);
+    auto msg = events.add_group_peer_status ();
+	msg->set_group_number (group_number);
+	msg->set_peer_number (peer_number);
+
+    set_user_status(msg, status);
+}
+
+static void
+tox4j_group_topic_cb (Tox *tox, uint32_t group_number, uint32_t peer_number, const uint8_t *topic, size_t length, Events &events)
+{
+    debug_log (tox4j_group_topic_cb, tox, group_number, peer_number, topic, length);
+    auto msg = events.add_group_topic ();
+	msg->set_group_number (group_number);
+	msg->set_peer_number (peer_number);
+	msg->set_topic (topic, length);
+}
+
+static void
+tox4j_group_privacy_state_cb (Tox *tox, uint32_t group_number, TOX_GROUP_PRIVACY_STATE privacy_state, Events &events)
+{
+    debug_log (tox4j_group_privacy_state_cb, tox, group_number, privacy_state);
+    auto msg = events.add_group_privacy_state ();
+	msg->set_group_number (group_number);
+
+	using proto::PrivacyState;
+	switch (privacy_state)
+	  {
+	  case TOX_GROUP_PRIVACY_STATE_PUBLIC:
+	    msg->set_privacy_state (PrivacyState::PUBLIC);
+	    break;
+	  case TOX_GROUP_PRIVACY_STATE_PRIVATE:
+	    msg->set_privacy_state (PrivacyState::PRIVATE);
+      	break;
+	  }
+}
+
+static void
+tox4j_group_peer_limit_cb (Tox *tox, uint32_t group_number, uint32_t peer_limit, Events &events)
+{
+    debug_log (tox4j_group_peer_limit_cb, tox, group_number, peer_limit);
+    auto msg = events.add_group_peer_limit ();
+	msg->set_group_number (group_number);
+	msg->set_peer_limit (peer_limit);
+}
+
+static void
+tox4j_group_password_cb (Tox *tox, uint32_t group_number, const uint8_t *password, size_t length, Events &events)
+{
+    debug_log (tox4j_group_password_cb, tox, group_number, password, length);
+    auto msg = events.add_group_password ();
+	msg->set_group_number (group_number);
+	msg->set_password (password, length);
+}
+
+static void
+tox4j_group_peerlist_update_cb (Tox *tox, uint32_t group_number, Events &events)
+{
+    debug_log (tox4j_group_peerlist_update_cb, tox, group_number);
+    auto msg = events.add_group_peerlist_update ();
+	msg->set_group_number (group_number);
+}
+
+static void
+tox4j_group_message_cb (Tox *tox, uint32_t group_number, uint32_t peer_number, TOX_MESSAGE_TYPE type, const uint8_t *message, size_t length, Events &events)
+{
+    debug_log (tox4j_group_message_cb, tox, group_number, peer_number, type, message, length);
+    auto msg = events.add_group_message ();
+	msg->set_group_number (group_number);
+	msg->set_peer_number (peer_number);
+    set_message_type (msg, type);
+	msg->set_message (message, length);
+}
+
+static void
+tox4j_group_private_message_cb (Tox *tox, uint32_t group_number, uint32_t peer_number, const uint8_t *message, size_t length, Events &events)
+{
+    debug_log (tox4j_group_private_message_cb, tox, group_number, peer_number, message, length);
+    auto msg = events.add_group_private_message ();
+	msg->set_group_number (group_number);
+	msg->set_peer_number (peer_number);
+	msg->set_message (message, length);
+}
+
+static void
+tox4j_group_invite_cb (Tox *tox, int32_t friend_number, const uint8_t *invite_data, size_t length, Events &events)
+{
+    debug_log (tox4j_group_invite_cb, tox, friend_number, invite_data, length);
+    auto msg = events.add_group_invite ();
+	msg->set_friend_number (friend_number);
+	msg->set_invite_data (invite_data, length);
+}
+
+static void
+tox4j_group_peer_join_cb (Tox *tox, uint32_t group_number, uint32_t peer_number, Events &events)
+{
+    debug_log (tox4j_group_peer_join_cb, tox, group_number, peer_number);
+    auto msg = events.add_group_peer_join ();
+	msg->set_group_number (group_number);
+	msg->set_peer_number (peer_number);
+}
+
+static void
+tox4j_group_peer_exit_cb (Tox *tox, uint32_t group_number, uint32_t peer_number, const uint8_t *part_message, size_t length, Events &events)
+{
+    debug_log (tox4j_group_peer_exit_cb, tox, group_number, peer_number, part_message, length);
+    auto msg = events.add_group_peer_exit ();
+	msg->set_group_number (group_number);
+	msg->set_peer_number (peer_number);
+	msg->set_part_message (part_message, length);
+}
+
+static void
+tox4j_group_self_join_cb (Tox *tox, uint32_t group_number, Events &events)
+{
+    debug_log (tox4j_group_self_join_cb, tox, group_number);
+    auto msg = events.add_group_self_join ();
+	msg->set_group_number (group_number);
+}
+
+static void
+tox4j_group_join_fail_cb (Tox *tox, uint32_t group_number, TOX_GROUP_JOIN_FAIL type, Events &events)
+{
+    debug_log (tox4j_group_join_fail_cb, tox, group_number, type);
+    auto msg = events.add_group_join_fail ();
+	msg->set_group_number (group_number);
+
+	using proto::JoinFail;
+	switch (type)
+  	  {
+  	  case TOX_GROUP_JOIN_FAIL_NAME_TAKEN:
+  	    msg->set_type (JoinFail::NAME_TAKEN);
+  	    break;
+  	  case TOX_GROUP_JOIN_FAIL_PEER_LIMIT:
+  	    msg->set_type (JoinFail::PEER_LIMIT);
+        break;
+  	  case TOX_GROUP_JOIN_FAIL_INVALID_PASSWORD:
+  	    msg->set_type (JoinFail::INVALID_PASSWORD);
+        break;
+  	  case TOX_GROUP_JOIN_FAIL_UNKNOWN:
+  	    msg->set_type (JoinFail::UNKNOWN);
+        break;
+	  }
+}
+
+static void
+tox4j_group_moderation_cb (Tox *tox, uint32_t group_number, uint32_t source_peernum, uint32_t target_peernum, TOX_GROUP_MOD_EVENT type, Events &events)
+{
+    debug_log (tox4j_group_moderation_cb, tox, group_number, source_peernum, target_peernum, type);
+    auto msg = events.add_group_moderation ();
+	msg->set_group_number (group_number);
+	msg->set_source_peer_number (source_peernum);
+	msg->set_target_peer_number (target_peernum);
+
+	using proto::GroupModEvent;
+	switch (type)
+	  {
+	  case TOX_GROUP_MOD_EVENT_KICK:
+	    msg->set_type(GroupModEvent::KICK);
+	    break;
+	  case TOX_GROUP_MOD_EVENT_BAN:
+	    msg->set_type(GroupModEvent::BAN);
+      	break;
+	  case TOX_GROUP_MOD_EVENT_OBSERVER:
+	    msg->set_type(GroupModEvent::OBSERVER);
+      	break;
+	  case TOX_GROUP_MOD_EVENT_USER:
+	    msg->set_type(GroupModEvent::USER);
+      	break;
+	  case TOX_GROUP_MOD_EVENT_MODERATOR:
+	    msg->set_type(GroupModEvent::MODERATOR);
+      	break;
+	  }
+}
 
 static auto
 tox_options_new_unique ()
@@ -318,7 +517,22 @@ TOX_METHOD (jint, New,
           register_func (tox4j_file_recv_chunk_cb         ),
           register_func (tox4j_file_chunk_request_cb      ),
           register_func (tox4j_friend_lossy_packet_cb     ),
-          register_func (tox4j_friend_lossless_packet_cb  )
+          register_func (tox4j_friend_lossless_packet_cb  ),
+          register_func (tox4j_group_peer_name_cb         ),
+          register_func (tox4j_group_peer_status_cb       ),
+          register_func (tox4j_group_topic_cb             ),
+          register_func (tox4j_group_privacy_state_cb     ),
+          register_func (tox4j_group_peer_limit_cb        ),
+          register_func (tox4j_group_password_cb          ),
+          register_func (tox4j_group_peerlist_update_cb   ),
+          register_func (tox4j_group_message_cb           ),
+          register_func (tox4j_group_private_message_cb   ),
+          register_func (tox4j_group_invite_cb            ),
+          register_func (tox4j_group_peer_join_cb         ),
+          register_func (tox4j_group_peer_exit_cb         ),
+          register_func (tox4j_group_self_join_cb         ),
+          register_func (tox4j_group_join_fail_cb         ),
+          register_func (tox4j_group_moderation_cb        )
         );
 
         // Create the master events object and set up our callbacks.
@@ -338,6 +552,21 @@ TOX_METHOD (jint, New,
           .set<tox::callback_file_chunk_request,        tox4j_file_chunk_request_cb      > ()
           .set<tox::callback_friend_lossy_packet,       tox4j_friend_lossy_packet_cb     > ()
           .set<tox::callback_friend_lossless_packet,    tox4j_friend_lossless_packet_cb  > ()
+          .set<tox::callback_group_peer_name,           tox4j_group_peer_name_cb         > ()
+          .set<tox::callback_group_peer_status,         tox4j_group_peer_status_cb       > ()
+          .set<tox::callback_group_topic,               tox4j_group_topic_cb             > ()
+          .set<tox::callback_group_privacy_state,       tox4j_group_privacy_state_cb     > ()
+          .set<tox::callback_group_peer_limit,          tox4j_group_peer_limit_cb        > ()
+          .set<tox::callback_group_password,            tox4j_group_password_cb          > ()
+          .set<tox::callback_group_peerlist_update,     tox4j_group_peerlist_update_cb   > ()
+          .set<tox::callback_group_message,             tox4j_group_message_cb           > ()
+          .set<tox::callback_group_private_message,     tox4j_group_private_message_cb   > ()
+          .set<tox::callback_group_invite,              tox4j_group_invite_cb            > ()
+          .set<tox::callback_group_peer_join,           tox4j_group_peer_join_cb         > ()
+          .set<tox::callback_group_peer_exit,           tox4j_group_peer_exit_cb         > ()
+          .set<tox::callback_group_self_join,           tox4j_group_self_join_cb         > ()
+          .set<tox::callback_group_join_fail,           tox4j_group_join_fail_cb         > ()
+          .set<tox::callback_group_moderation,          tox4j_group_moderation_cb        > ()
           .set (tox.get ());
 
         // We can create the new instance outside instance_manager's critical section.

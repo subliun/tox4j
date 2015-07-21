@@ -32,5 +32,20 @@ namespace tox
   CALLBACK (file_recv_chunk);
   CALLBACK (friend_lossy_packet);
   CALLBACK (friend_lossless_packet);
+  CALLBACK (group_peer_name);
+  CALLBACK (group_peer_status);
+  CALLBACK (group_topic);
+  CALLBACK (group_privacy_state);
+  CALLBACK (group_peer_limit);
+  CALLBACK (group_password);
+  CALLBACK (group_peerlist_update);
+  CALLBACK (group_message);
+  CALLBACK (group_private_message);
+  CALLBACK (group_invite);
+  CALLBACK (group_peer_join);
+  CALLBACK (group_peer_exit);
+  CALLBACK (group_self_join);
+  CALLBACK (group_join_fail);
+  CALLBACK (group_moderation);
 #undef CALLBACK
 }

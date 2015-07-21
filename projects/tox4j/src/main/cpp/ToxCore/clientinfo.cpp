@@ -81,7 +81,6 @@ TOX_METHOD (jbyteArray, SelfGetAddress,
   );
 }
 
-
 /*
  * Class:     im_tox_tox4j_impl_ToxCoreJni
  * Method:    toxSelfSetName

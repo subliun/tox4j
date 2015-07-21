@@ -40,3 +40,4 @@ TOX_METHOD (jint, FriendSendMessage,
     tox_friend_send_message, friendNumber, message_type, message_array.data (), message_array.size ()
   );
 }
+

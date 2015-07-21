@@ -75,7 +75,22 @@ register_funcs (
   register_func (tox_callback_friend_lossless_packet),
   register_func (tox_self_get_dht_id),
   register_func (tox_self_get_udp_port),
-  register_func (tox_self_get_tcp_port)
+  register_func (tox_self_get_tcp_port),
+  register_func (tox_callback_group_peer_name),
+  register_func (tox_callback_group_peer_status),
+  register_func (tox_callback_group_topic),
+  register_func (tox_callback_group_privacy_state),
+  register_func (tox_callback_group_peer_limit),
+  register_func (tox_callback_group_password),
+  register_func (tox_callback_group_peerlist_update),
+  register_func (tox_callback_group_message),
+  register_func (tox_callback_group_private_message),
+  register_func (tox_callback_group_invite),
+  register_func (tox_callback_group_peer_join),
+  register_func (tox_callback_group_peer_exit),
+  register_func (tox_callback_group_self_join),
+  register_func (tox_callback_group_join_fail),
+  register_func (tox_callback_group_moderation)
 );
 
 template<>
@@ -161,5 +176,56 @@ print_arg<TOX_MESSAGE_TYPE> (TOX_MESSAGE_TYPE kind)
     {
     enum_case (MESSAGE_TYPE_NORMAL);
     enum_case (MESSAGE_TYPE_ACTION);
+    }
+}
+
+template<>
+void
+print_arg<TOX_GROUP_ROLE> (TOX_GROUP_ROLE kind)
+{
+  switch (kind)
+    {
+    enum_case (GROUP_ROLE_FOUNDER);
+    enum_case (GROUP_ROLE_MODERATOR);
+    enum_case (GROUP_ROLE_USER);
+    enum_case (GROUP_ROLE_OBSERVER);
+    }
+}
+
+template<>
+void
+print_arg<TOX_GROUP_JOIN_FAIL> (TOX_GROUP_JOIN_FAIL kind)
+{
+  switch (kind)
+    {
+    enum_case (GROUP_JOIN_FAIL_NAME_TAKEN);
+    enum_case (GROUP_JOIN_FAIL_PEER_LIMIT);
+    enum_case (GROUP_JOIN_FAIL_INVALID_PASSWORD);
+    enum_case (GROUP_JOIN_FAIL_UNKNOWN);
+    }
+}
+
+template<>
+void
+print_arg<TOX_GROUP_MOD_EVENT> (TOX_GROUP_MOD_EVENT kind)
+{
+  switch (kind)
+    {
+    enum_case (GROUP_MOD_EVENT_KICK);
+    enum_case (GROUP_MOD_EVENT_BAN);
+    enum_case (GROUP_MOD_EVENT_OBSERVER);
+    enum_case (GROUP_MOD_EVENT_USER);
+    enum_case (GROUP_MOD_EVENT_MODERATOR);
+    }
+}
+
+template<>
+void
+print_arg<TOX_GROUP_PRIVACY_STATE> (TOX_GROUP_PRIVACY_STATE kind)
+{
+  switch (kind)
+    {
+    enum_case (GROUP_PRIVACY_STATE_PUBLIC);
+    enum_case (GROUP_PRIVACY_STATE_PRIVATE);
     }
 }

@@ -84,4 +84,30 @@ public interface ToxCoreConstants {
    */
   int DEFAULT_TCP_PORT            = 0;
 
+  
+  /**
+   * Maximum length of a group topic.
+   */
+  int GROUP_MAX_TOPIC_LENGTH     = 512;
+
+  /**
+   * Maximum length of a peer part message.
+   */
+  int GROUP_MAX_PART_LENGTH      = 128;
+
+  /**
+   * Maximum length of a group name.
+   */
+  int GROUP_MAX_GROUP_NAME_LENGTH = 48;
+
+  /**
+   * Maximum length of a group password.
+   */
+  int GROUP_MAX_PASSWORD_SIZE       = 32;
+
+  /**
+   * Number of bytes in a group Chat ID.
+   */
+  int GROUP_CHAT_ID_SIZE          = 32;
+
 }

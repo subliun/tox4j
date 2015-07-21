@@ -48,3 +48,21 @@ get_array (JNIEnv *env, Tox const *tox)
 
   return toJavaArray (env, name);
 }
+
+template<typename T, typename Error, Error OK, typename ...Args>
+struct get_vector_err
+{
+  template<size_t get_size (Tox const *, Args..., Error *), bool get_data (Tox const *, Args..., T *,  Error *)>
+  static std::vector<T>
+  compose (Tox const *tox, Args ...args, Error *error)
+  {
+    std::size_t size = get_size (tox, args..., error);
+    if (*error != OK)
+      return { };
+
+    std::vector<T> vector (size);
+    get_data (tox, args..., vector.data (), error);
+
+    return vector;
+  }
+};

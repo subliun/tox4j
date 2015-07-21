@@ -3,7 +3,7 @@ package im.tox.tox4j.impl.jni
 import com.typesafe.scalalogging.Logger
 import im.tox.tox4j.ToxImplBase.tryAndLog
 import im.tox.tox4j.core.callbacks._
-import im.tox.tox4j.core.enums.{ ToxConnection, ToxFileControl, ToxMessageType, ToxUserStatus }
+import im.tox.tox4j.core.enums._
 import im.tox.tox4j.core.exceptions._
 import im.tox.tox4j.core.options.ToxOptions
 import im.tox.tox4j.core.proto.Core._
@@ -67,6 +67,32 @@ private object ToxCoreImpl {
     messageType match {
       case MessageType.Type.NORMAL => ToxMessageType.NORMAL
       case MessageType.Type.ACTION => ToxMessageType.ACTION
+    }
+  }
+
+  private def convert(privacyState: PrivacyState.Type): ToxGroupPrivacyState = {
+    privacyState match {
+      case PrivacyState.Type.PUBLIC  => ToxGroupPrivacyState.PUBLIC
+      case PrivacyState.Type.PRIVATE => ToxGroupPrivacyState.PRIVATE
+    }
+  }
+
+  private def convert(joinFail: JoinFail.Type): ToxGroupJoinFail = {
+    joinFail match {
+      case JoinFail.Type.NAME_TAKEN       => ToxGroupJoinFail.NAME_TAKEN
+      case JoinFail.Type.PEER_LIMIT       => ToxGroupJoinFail.PEER_LIMIT
+      case JoinFail.Type.INVALID_PASSWORD => ToxGroupJoinFail.INVALID_PASSWORD
+      case JoinFail.Type.UNKNOWN          => ToxGroupJoinFail.UNKNOWN
+    }
+  }
+
+  private def convert(groupModEvent: GroupModEvent.Type): ToxGroupModEvent = {
+    groupModEvent match {
+      case GroupModEvent.Type.KICK      => ToxGroupModEvent.KICK
+      case GroupModEvent.Type.BAN       => ToxGroupModEvent.BAN
+      case GroupModEvent.Type.OBSERVER  => ToxGroupModEvent.OBSERVER
+      case GroupModEvent.Type.USER      => ToxGroupModEvent.USER
+      case GroupModEvent.Type.MODERATOR => ToxGroupModEvent.MODERATOR
     }
   }
 
@@ -341,6 +367,141 @@ final class ToxCoreImpl[ToxCoreState](@NotNull val options: ToxOptions) extends 
     }
   }
 
+  private def dispatchGroupPeerName(groupPeerName: Seq[GroupPeerName])(state: ToxCoreState): ToxCoreState = {
+    groupPeerName.foldLeft(state) {
+      case (state, GroupPeerName(groupNumber, peerNumber, name)) =>
+        tryAndLog(options.fatalErrors, state, eventListener)(_.groupPeerName(
+          groupNumber, peerNumber, name.toByteArray
+        ))
+    }
+  }
+
+  private def dispatchGroupPeerStatus(groupPeerStatus: Seq[GroupPeerStatus])(state: ToxCoreState): ToxCoreState = {
+    groupPeerStatus.foldLeft(state) {
+      case (state, GroupPeerStatus(groupNumber, peerNumber, status)) =>
+        tryAndLog(options.fatalErrors, state, eventListener)(_.groupPeerStatus(
+          groupNumber, peerNumber, convert(status)
+        ))
+    }
+  }
+
+  private def dispatchGroupTopic(groupTopic: Seq[GroupTopic])(state: ToxCoreState): ToxCoreState = {
+    groupTopic.foldLeft(state) {
+      case (state, GroupTopic(groupNumber, peerNumber, topic)) =>
+        tryAndLog(options.fatalErrors, state, eventListener)(_.groupTopic(
+          groupNumber, peerNumber, topic.toByteArray
+        ))
+    }
+  }
+
+  private def dispatchGroupPrivacyState(groupPrivacyState: Seq[GroupPrivacyState])(state: ToxCoreState): ToxCoreState = {
+    groupPrivacyState.foldLeft(state) {
+      case (state, GroupPrivacyState(groupNumber, privacyState)) =>
+        tryAndLog(options.fatalErrors, state, eventListener)(_.groupPrivacyState(
+          groupNumber, convert(privacyState)
+        ))
+    }
+  }
+
+  private def dispatchGroupPeerLimit(groupPeerLimit: Seq[GroupPeerLimit])(state: ToxCoreState): ToxCoreState = {
+    groupPeerLimit.foldLeft(state) {
+      case (state, GroupPeerLimit(groupNumber, peerLimit)) =>
+        tryAndLog(options.fatalErrors, state, eventListener)(_.groupPeerLimit(
+          groupNumber, peerLimit
+        ))
+    }
+  }
+
+  private def dispatchGroupPassword(groupPassword: Seq[GroupPassword])(state: ToxCoreState): ToxCoreState = {
+    groupPassword.foldLeft(state) {
+      case (state, GroupPassword(groupNumber, password)) =>
+        tryAndLog(options.fatalErrors, state, eventListener)(_.groupPassword(
+          groupNumber, password.toByteArray
+        ))
+    }
+  }
+
+  private def dispatchGroupPeerlistUpdate(groupPeerlistUpdate: Seq[GroupPeerlistUpdate])(state: ToxCoreState): ToxCoreState = {
+    groupPeerlistUpdate.foldLeft(state) {
+      case (state, GroupPeerlistUpdate(groupNumber)) =>
+        tryAndLog(options.fatalErrors, state, eventListener)(_.groupPeerlistUpdate(
+          groupNumber
+        ))
+    }
+  }
+
+  private def dispatchGroupMessage(groupMessage: Seq[GroupMessage])(state: ToxCoreState): ToxCoreState = {
+    groupMessage.foldLeft(state) {
+      case (state, GroupMessage(groupNumber, peerNumber, messageType, message)) =>
+        tryAndLog(options.fatalErrors, state, eventListener)(_.groupMessage(
+          groupNumber, peerNumber, convert(messageType), message.toByteArray
+        ))
+    }
+  }
+
+  private def dispatchGroupPrivateMessage(groupPrivateMessage: Seq[GroupPrivateMessage])(state: ToxCoreState): ToxCoreState = {
+    groupPrivateMessage.foldLeft(state) {
+      case (state, GroupPrivateMessage(groupNumber, peerNumber, message)) =>
+        tryAndLog(options.fatalErrors, state, eventListener)(_.groupPrivateMessage(
+          groupNumber, peerNumber, message.toByteArray
+        ))
+    }
+  }
+
+  private def dispatchGroupInvite(groupInvite: Seq[GroupInvite])(state: ToxCoreState): ToxCoreState = {
+    groupInvite.foldLeft(state) {
+      case (state, GroupInvite(friendNumber, inviteData)) =>
+        tryAndLog(options.fatalErrors, state, eventListener)(_.groupInvite(
+          friendNumber, inviteData.toByteArray
+        ))
+    }
+  }
+
+  private def dispatchGroupPeerJoin(groupPeerJoin: Seq[GroupPeerJoin])(state: ToxCoreState): ToxCoreState = {
+    groupPeerJoin.foldLeft(state) {
+      case (state, GroupPeerJoin(groupNumber, peerNumber)) =>
+        tryAndLog(options.fatalErrors, state, eventListener)(_.groupPeerJoin(
+          groupNumber, peerNumber
+        ))
+    }
+  }
+
+  private def dispatchGroupPeerExit(groupPeerExit: Seq[GroupPeerExit])(state: ToxCoreState): ToxCoreState = {
+    groupPeerExit.foldLeft(state) {
+      case (state, GroupPeerExit(groupNumber, peerNumber, partMessage)) =>
+        tryAndLog(options.fatalErrors, state, eventListener)(_.groupPeerExit(
+          groupNumber, peerNumber, partMessage.toByteArray
+        ))
+    }
+  }
+
+  private def dispatchGroupSelfJoin(groupSelfJoin: Seq[GroupSelfJoin])(state: ToxCoreState): ToxCoreState = {
+    groupSelfJoin.foldLeft(state) {
+      case (state, GroupSelfJoin(groupNumber)) =>
+        tryAndLog(options.fatalErrors, state, eventListener)(_.groupSelfJoin(
+          groupNumber
+        ))
+    }
+  }
+
+  private def dispatchGroupJoinFail(groupJoinFail: Seq[GroupJoinFail])(state: ToxCoreState): ToxCoreState = {
+    groupJoinFail.foldLeft(state) {
+      case (state, GroupJoinFail(groupNumber, groupJoinFailType)) =>
+        tryAndLog(options.fatalErrors, state, eventListener)(_.groupJoinFail(
+          groupNumber, convert(groupJoinFailType)
+        ))
+    }
+  }
+
+  private def dispatchGroupModeration(groupModeration: Seq[GroupModeration])(state: ToxCoreState): ToxCoreState = {
+    groupModeration.foldLeft(state) {
+      case (state, GroupModeration(groupNumber, sourcePeerNumber, targetPeerNumber, groupModEventType)) =>
+        tryAndLog(options.fatalErrors, state, eventListener)(_.groupModeration(
+          groupNumber, sourcePeerNumber, targetPeerNumber, convert(groupModEventType)
+        ))
+    }
+  }
+
   private def dispatchEvents(state: ToxCoreState, events: CoreEvents): ToxCoreState = {
     (state
       |> dispatchSelfConnectionStatus(events.selfConnectionStatus)
@@ -357,7 +518,22 @@ final class ToxCoreImpl[ToxCoreState](@NotNull val options: ToxOptions) extends 
       |> dispatchFileRecv(events.fileRecv)
       |> dispatchFileRecvChunk(events.fileRecvChunk)
       |> dispatchFriendLossyPacket(events.friendLossyPacket)
-      |> dispatchFriendLosslessPacket(events.friendLosslessPacket))
+      |> dispatchFriendLosslessPacket(events.friendLosslessPacket)
+      |> dispatchGroupPeerName(events.groupPeerName)
+      |> dispatchGroupPeerStatus(events.groupPeerStatus)
+      |> dispatchGroupTopic(events.groupTopic)
+      |> dispatchGroupPrivacyState(events.groupPrivacyState)
+      |> dispatchGroupPeerLimit(events.groupPeerLimit)
+      |> dispatchGroupPassword(events.groupPassword)
+      |> dispatchGroupPeerlistUpdate(events.groupPeerlistUpdate)
+      |> dispatchGroupMessage(events.groupMessage)
+      |> dispatchGroupPrivateMessage(events.groupPrivateMessage)
+      |> dispatchGroupInvite(events.groupInvite)
+      |> dispatchGroupPeerJoin(events.groupPeerJoin)
+      |> dispatchGroupPeerExit(events.groupPeerExit)
+      |> dispatchGroupSelfJoin(events.groupSelfJoin)
+      |> dispatchGroupJoinFail(events.groupJoinFail)
+      |> dispatchGroupModeration(events.groupModeration))
   }
 
   override def iterate(state: ToxCoreState): ToxCoreState = {
@@ -461,6 +637,145 @@ final class ToxCoreImpl[ToxCoreState](@NotNull val options: ToxOptions) extends 
   @throws[ToxFileGetException]
   override def fileGetFileId(friendNumber: Int, fileNumber: Int): Array[Byte] =
     ToxCoreJni.toxFileGetFileId(instanceNumber, friendNumber, fileNumber)
+
+  @throws[ToxGroupNewException]
+  override def groupNew(privacyState: ToxGroupPrivacyState, groupName: Array[Byte]): Int =
+    ToxCoreJni.toxGroupNew(instanceNumber, privacyState.ordinal, groupName)
+
+  @throws[ToxGroupJoinException]
+  override def groupJoin(chatId: Array[Byte], password: Array[Byte]): Int =
+    ToxCoreJni.toxGroupJoin(instanceNumber, chatId, password)
+
+  @throws[ToxGroupReconnectException]
+  override def groupReconnect(groupNumber: Int): Unit =
+    ToxCoreJni.toxGroupReconnect(instanceNumber, groupNumber)
+
+  @throws[ToxGroupLeaveException]
+  override def groupLeave(groupNumber: Int, message: Array[Byte]): Unit =
+    ToxCoreJni.toxGroupLeave(instanceNumber, groupNumber, message)
+
+  @throws[ToxGroupSelfNameSetException]
+  override def setGroupSelfName(groupNumber: Int, name: Array[Byte]): Unit =
+    ToxCoreJni.toxGroupSelfSetName(instanceNumber, groupNumber, name)
+
+  @throws[ToxGroupSelfQueryException]
+  override def getGroupSelfName(groupNumber: Int): Array[Byte] =
+    ToxCoreJni.toxGroupSelfGetName(instanceNumber, groupNumber)
+
+  @throws[ToxGroupSelfStatusSetException]
+  override def setGroupSelfStatus(groupNumber: Int, status: ToxUserStatus): Unit =
+    ToxCoreJni.toxGroupSelfSetStatus(instanceNumber, groupNumber, status.ordinal)
+
+  @throws[ToxGroupSelfQueryException]
+  override def getGroupSelfStatus(groupNumber: Int): ToxUserStatus =
+    ToxUserStatus.values()(ToxCoreJni.toxGroupSelfGetStatus(instanceNumber, groupNumber))
+
+  @throws[ToxGroupSelfQueryException]
+  override def getGroupSelfRole(groupNumber: Int): ToxGroupRole =
+    ToxGroupRole.values()(ToxCoreJni.toxGroupSelfGetRole(instanceNumber, groupNumber))
+
+  @throws[ToxGroupPeerQueryException]
+  override def getGroupPeerName(groupNumber: Int, peerNumber: Int): Array[Byte] =
+    ToxCoreJni.toxGroupPeerGetName(instanceNumber, groupNumber, peerNumber)
+
+  @throws[ToxGroupPeerQueryException]
+  override def getGroupPeerStatus(groupNumber: Int, peerNumber: Int): ToxUserStatus =
+    ToxUserStatus.values()(ToxCoreJni.toxGroupPeerGetStatus(instanceNumber, groupNumber, peerNumber))
+
+  @throws[ToxGroupPeerQueryException]
+  override def getGroupPeerRole(groupNumber: Int, peerNumber: Int): ToxGroupRole =
+    ToxGroupRole.values()(ToxCoreJni.toxGroupPeerGetRole(instanceNumber, groupNumber, peerNumber))
+
+  @throws[ToxGroupTopicSetException]
+  override def setGroupTopic(groupNumber: Int, topic: Array[Byte]): Unit =
+    ToxCoreJni.toxGroupSetTopic(instanceNumber, groupNumber, topic)
+
+  @throws[ToxGroupStateQueriesException]
+  override def getGroupTopic(groupNumber: Int): Array[Byte] =
+    ToxCoreJni.toxGroupGetTopic(instanceNumber, groupNumber)
+
+  @throws[ToxGroupStateQueriesException]
+  override def getGroupName(groupNumber: Int): Array[Byte] =
+    ToxCoreJni.toxGroupGetName(instanceNumber, groupNumber)
+
+  @throws[ToxGroupStateQueriesException]
+  override def getGroupChatId(groupNumber: Int): Array[Byte] =
+    ToxCoreJni.toxGroupGetChatId(instanceNumber, groupNumber)
+
+  @throws[ToxGroupStateQueriesException]
+  override def getGroupNumberPeers(groupNumber: Int): Int =
+    ToxCoreJni.toxGroupGetNumberPeers(instanceNumber, groupNumber)
+
+  override def getGroupNumberGroups: Int =
+    ToxCoreJni.toxGroupGetNumberGroups(instanceNumber)
+
+  @throws[ToxGroupStateQueriesException]
+  override def getGroupPrivacyState(groupNumber: Int): ToxGroupPrivacyState =
+    ToxGroupPrivacyState.values()(ToxCoreJni.toxGroupGetPrivacyState(instanceNumber, groupNumber))
+
+  @throws[ToxGroupStateQueriesException]
+  override def getGroupPeerLimit(groupNumber: Int): Int =
+    ToxCoreJni.toxGroupGetPeerLimit(instanceNumber, groupNumber)
+
+  @throws[ToxGroupStateQueriesException]
+  override def getGroupPassword(groupNumber: Int): Array[Byte] =
+    ToxCoreJni.toxGroupGetPassword(instanceNumber, groupNumber)
+
+  @throws[ToxGroupSendMessageException]
+  override def groupSendMessage(groupNumber: Int, messageType: ToxMessageType, message: Array[Byte]): Unit =
+    ToxCoreJni.toxGroupSendMessage(instanceNumber, groupNumber, messageType.ordinal, message)
+
+  @throws[ToxGroupSendPrivateMessageException]
+  override def groupSendPrivateMessage(groupNumber: Int, peerNumber: Int, message: Array[Byte]): Unit =
+    ToxCoreJni.toxGroupSendPrivateMessage(instanceNumber, groupNumber, peerNumber, message)
+
+  @throws[ToxGroupInviteFriendException]
+  override def groupInviteFriend(groupNumber: Int, friendNumber: Int): Unit =
+    ToxCoreJni.toxGroupInviteFriend(instanceNumber, groupNumber, friendNumber)
+
+  @throws[ToxGroupInviteAcceptException]
+  override def groupInviteAccept(inviteData: Array[Byte], password: Array[Byte]): Int =
+    ToxCoreJni.toxGroupInviteAccept(instanceNumber, inviteData, password)
+
+  @throws[ToxGroupFounderSetPasswordException]
+  override def setGroupFounderPassword(groupNumber: Int, password: Array[Byte]): Unit =
+    ToxCoreJni.toxGroupFounderSetPassword(instanceNumber, groupNumber, password)
+
+  @throws[ToxGroupFounderSetPrivacyStateException]
+  override def setGroupFounderPrivacyState(groupNumber: Int, privacyState: ToxGroupPrivacyState): Unit =
+    ToxCoreJni.toxGroupFounderSetPrivacyState(instanceNumber, groupNumber, privacyState.ordinal)
+
+  @throws[ToxGroupFounderSetPeerLimitException]
+  override def setGroupFounderPeerLimit(groupNumber: Int, maxPeers: Int): Unit =
+    ToxCoreJni.toxGroupFounderSetPeerLimit(instanceNumber, groupNumber, maxPeers)
+
+  @throws[ToxGroupToggleIgnoreException]
+  override def groupToggleIgnore(groupNumber: Int, peerNumber: Int, ignore: Boolean): Unit =
+    ToxCoreJni.toxGroupToggleIgnore(instanceNumber, groupNumber, peerNumber, ignore)
+
+  @throws[ToxGroupModSetRoleException]
+  override def setGroupModRole(groupNumber: Int, peerNumber: Int, role: ToxGroupRole): Unit =
+    ToxCoreJni.toxGroupModSetRole(instanceNumber, groupNumber, peerNumber, role.ordinal)
+
+  @throws[ToxGroupModRemovePeerException]
+  override def groupModRemovePeer(groupNumber: Int, peerNumber: Int, setBan: Boolean): Unit =
+    ToxCoreJni.toxGroupModRemovePeer(instanceNumber, groupNumber, peerNumber, setBan)
+
+  @throws[ToxGroupModRemoveBanException]
+  override def groupModRemoveBan(groupNumber: Int, banId: Short): Unit =
+    ToxCoreJni.toxGroupModRemoveBan(instanceNumber, groupNumber, banId)
+
+  @throws[ToxGroupBanQueryException]
+  override def getGroupBanList(groupNumber: Int): Array[Short] =
+    ToxCoreJni.toxGroupBanGetList(instanceNumber, groupNumber)
+
+  @throws[ToxGroupBanQueryException]
+  override def getGroupBanName(groupNumber: Int, banId: Short): Array[Byte] =
+    ToxCoreJni.toxGroupBanGetName(instanceNumber, groupNumber, banId)
+
+  @throws[ToxGroupBanQueryException]
+  override def getGroupBanTimeSet(groupNumber: Int, banId: Short): Long =
+    ToxCoreJni.toxGroupBanGetTimeSet(instanceNumber, groupNumber, banId)
 
   @throws[ToxFriendCustomPacketException]
   override def sendLossyPacket(friendNumber: Int, data: Array[Byte]): Unit =
